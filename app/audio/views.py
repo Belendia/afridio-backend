@@ -6,10 +6,17 @@ from core.models import Genre
 from audio import serializers
 
 
-class GenreViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
+class GenreViewSet(viewsets.GenericViewSet,
+                   mixins.ListModelMixin,
+                   mixins.CreateModelMixin):
     """Manage genres in database"""
 
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
     queryset = Genre.objects.all()
     serializer_class = serializers.GenreSerializer
+
+    def perform_create(self, serializer):
+        """Create a new genre"""
+
+        serializer.save(user=self.request.user)

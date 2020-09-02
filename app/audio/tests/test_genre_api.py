@@ -49,3 +49,23 @@ class PrivateGenreApiTest(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
+
+    def test_create_genre_successful(self):
+        """Test creating a new genre"""
+
+        payload = {'name': 'Fiction'}
+        self.client.post(GENRE_URL, payload)
+
+        exists = Genre.objects.filter(
+            name=payload['name']
+        ).exists()
+
+        self.assertTrue(exists)
+
+    def test_create_genre_invalid(self):
+        """Test creating a new tag with invalid payload"""
+
+        payload = {'name': ''}
+        res = self.client.post(GENRE_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
