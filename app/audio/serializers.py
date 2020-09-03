@@ -8,5 +8,5 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        fields = ('id', 'name')
-        read_only_fields = ('id',)
+        fields = ('id', 'name', 'slug', 'created', 'updated')
+        read_only_fields = ('id', 'slug', 'created', 'updated')
