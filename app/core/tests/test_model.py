@@ -54,8 +54,21 @@ class ModelTests(TestCase):
         """Test the genre string representation"""
 
         genre = models.Genre.objects.create(
-            user=sample_user(),
-            name='Fiction'
+            name='Fiction',
+            user=sample_user()
         )
 
         self.assertEqual(str(genre), genre.name)
+
+    def test_track_str(self):
+        """Test the track string representation"""
+
+        track = models.Track.objects.create(
+            name='First track',
+            popularity=10,
+            original_url='http://localhost/audio/track1.mp3',
+            duration_ms=2500,
+            user=sample_user()
+        )
+
+        self.assertEqual(str(track), track.name)
