@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
@@ -85,3 +87,18 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(audiobook), audiobook.title)
+
+    def test_album_str(self):
+        """Test the album string representation"""
+
+        album = models.Album.objects.create(
+            name="Sample album",
+            album_type=models.Album.AlbumType.ALBUM,
+            estimated_length_in_seconds=25200,
+            popularity=35,
+            price=12.50,
+            release_date=datetime.now(),
+            user=sample_user()
+        )
+
+        self.assertEqual(str(album), album.name)

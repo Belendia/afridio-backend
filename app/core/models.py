@@ -1,3 +1,4 @@
+from enum import Enum
 from secrets import token_urlsafe
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
@@ -104,6 +105,42 @@ class AudioBook(models.Model):
         return self.title
 
 
+class Album(models.Model):
+    """Album object"""
+
+    class AlbumType(Enum):
+        ALBUM = "ALBUM"
+        SINGLE = "SINGLE"
+        COMPILATION = "COMPILATION"
+
+        @classmethod
+        def choices(cls):
+            return [(key.value, key.name) for key in cls]
+
+    name = models.CharField(max_length=255)
+    album_type = models.CharField(
+        max_length=20,
+        choices=AlbumType.choices()
+    )
+    estimated_length_in_seconds = models.PositiveIntegerField()
+    popularity = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    release_date = models.DateField()
+    slug = models.SlugField(blank=True, unique=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    genres = models.ManyToManyField('Genre')
+    tracks = models.ManyToManyField('Track')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT
+    )
+
+    def __str__(self):
+        return self.name
+
+
 def pre_save_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = slugify(token_urlsafe(16))
@@ -111,3 +148,5 @@ def pre_save_receiver(sender, instance, *args, **kwargs):
 
 pre_save.connect(pre_save_receiver, sender=Genre)
 pre_save.connect(pre_save_receiver, sender=Track)
+pre_save.connect(pre_save_receiver, sender=AudioBook)
+pre_save.connect(pre_save_receiver, sender=Album)
