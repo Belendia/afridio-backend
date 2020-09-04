@@ -50,9 +50,9 @@ class Genre(models.Model):
     """Genre to be used for a audio books and music"""
 
     name = models.CharField(max_length=255)
+    slug = models.SlugField(blank=True, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(blank=True, unique=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT
@@ -69,9 +69,9 @@ class Track(models.Model):
     popularity = models.PositiveIntegerField()
     original_url = models.URLField(max_length=200)
     duration_ms = models.PositiveIntegerField()
+    slug = models.SlugField(blank=True, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(blank=True, unique=True)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
