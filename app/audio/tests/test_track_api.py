@@ -55,3 +55,29 @@ class PrivateIngredientsApiTest(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
+
+    def test_create_track_successful(self):
+        """Test create a new track"""
+
+        payload = {
+            'name': 'Track 01',
+            'popularity': 10,
+            'duration_ms': 2500
+        }
+        self.client.post(TRACKS_URL, payload)
+
+        exists = Track.objects.filter(
+            name=payload['name']
+        ).exists()
+
+        self.assertTrue(exists)
+
+    def test_create_track_invalid(self):
+        """Test creating invalid track fails"""
+
+        payload = {
+            'name': ''
+        }
+        res = self.client.post(TRACKS_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)

@@ -33,7 +33,7 @@ class TrackViewSet(viewsets.GenericViewSet,
     serializer_class = serializers.TrackSerializer
 
     def perform_create(self, serializer):
-        """Create a new genre"""
+        """Create a new track"""
 
         serializer.save(user=self.request.user)
 

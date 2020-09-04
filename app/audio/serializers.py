@@ -19,4 +19,4 @@ class TrackSerializer(serializers.ModelSerializer):
         model = Track
         fields = ('id', 'name', 'popularity', 'original_url',
                   'duration_ms', 'slug', 'created', 'updated')
-        read_only_fields = ('id', 'slug', 'created', 'updated')
+        read_only_fields = ('id', 'slug', 'original_url', 'created', 'updated')
