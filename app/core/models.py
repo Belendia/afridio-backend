@@ -66,9 +66,9 @@ class Track(models.Model):
     """Track to be used for a audio books and music"""
 
     name = models.CharField(max_length=255)
-    popularity = models.PositiveIntegerField(),
-    original_url = models.URLField(max_length=200),
-    duration_ms = models.PositiveIntegerField(),
+    popularity = models.PositiveIntegerField()
+    original_url = models.URLField(max_length=200)
+    duration_ms = models.PositiveIntegerField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     slug = models.SlugField(blank=True, unique=True)
