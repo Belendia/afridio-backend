@@ -82,6 +82,28 @@ class Track(models.Model):
         return self.name
 
 
+class AudioBook(models.Model):
+    """AudioBook object"""
+
+    title = models.CharField(max_length=255)
+    word_count = models.PositiveIntegerField()
+    estimated_length_in_seconds = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    slug = models.SlugField(blank=True, unique=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    genres = models.ManyToManyField('Genre')
+    tracks = models.ManyToManyField('Track')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT
+    )
+
+    def __str__(self):
+        return self.title
+
+
 def pre_save_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = slugify(token_urlsafe(16))

@@ -72,3 +72,16 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(track), track.name)
+
+    def test_audiobook_str(self):
+        """Test the audiobook string representation"""
+
+        audiobook = models.AudioBook.objects.create(
+            title="The sample audio book",
+            word_count=12500,
+            estimated_length_in_seconds=25200,
+            price=12.50,
+            user=sample_user()
+        )
+
+        self.assertEqual(str(audiobook), audiobook.title)
