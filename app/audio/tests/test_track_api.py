@@ -12,7 +12,7 @@ TRACKS_URL = reverse('audio:tracks-list')
 
 
 class PublicTrackApiTests(TestCase):
-    """Test the publicly available ingredients API"""
+    """Test the publicly available track API"""
 
     def setUp(self):
         self.client = APIClient()
@@ -25,7 +25,7 @@ class PublicTrackApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
-class PrivateIngredientsApiTest(TestCase):
+class PrivateTracksApiTest(TestCase):
     """Test the private track API"""
 
     def setUp(self):

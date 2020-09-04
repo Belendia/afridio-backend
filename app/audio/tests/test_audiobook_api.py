@@ -1,0 +1,93 @@
+from django.contrib.auth import get_user_model
+from django.urls import reverse
+from django.test import TestCase
+
+from rest_framework import status
+from rest_framework.test import APIClient
+
+from core.models import AudioBook
+from audio.serializers import AudioBookSerializer
+
+AUDIOBOOK_URL = reverse('audio:audiobooks-list')
+
+
+def sample_audiobook(user, **params):
+    """Create and return a sample audiobook"""
+
+    defaults = {
+        'title': 'Sample audio book',
+        'word_count': 14543,
+        'estimated_length_in_seconds': 25000,
+        'price': 12.50
+    }
+
+    defaults.update(params)
+
+    return AudioBook.objects.create(user=user, **defaults)
+
+
+class PublicAudioBookApiTests(TestCase):
+    """Test the publicly available audiobooks API"""
+
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_login_required(self):
+        """Test that login is required to access the endpoint"""
+
+        res = self.client.get(AUDIOBOOK_URL)
+
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class PrivateAudioBooksApiTest(TestCase):
+    """Test the private audiobook API"""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            'test@habeltech.com',
+            'testpass'
+        )
+        self.client.force_authenticate(self.user)
+
+    def test_retrieve_audiobooks(self):
+        """Test retrieving a list of audiobooks"""
+
+        sample_audiobook(self.user, title='Audiobook 2')
+        sample_audiobook(self.user, title='Audiobook 1')
+
+        res = self.client.get(AUDIOBOOK_URL)
+
+        audiobooks = AudioBook.objects.all().order_by('-title')
+        serializer = AudioBookSerializer(audiobooks, many=True)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
+
+    def test_create_audiobook_successful(self):
+        """Test create a new audiobook"""
+
+        payload = {
+            'title': 'Sample audio book',
+            'word_count': 14543,
+            'estimated_length_in_seconds': 25000,
+            'price': 12.50
+        }
+        self.client.post(AUDIOBOOK_URL, payload)
+
+        exists = AudioBook.objects.filter(
+            title=payload['title']
+        ).exists()
+
+        self.assertTrue(exists)
+
+    def test_create_audiobook_invalid(self):
+        """Test creating invalid audiobook fails"""
+
+        payload = {
+            'title': ''
+        }
+        res = self.client.post(AUDIOBOOK_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)

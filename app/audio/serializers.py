@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Genre, Track
+from core.models import Genre, Track, AudioBook, Album
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -20,3 +20,30 @@ class TrackSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'popularity', 'original_url',
                   'duration_ms', 'slug', 'created', 'updated')
         read_only_fields = ('id', 'slug', 'original_url', 'created', 'updated')
+
+
+class AudioBookSerializer(serializers.ModelSerializer):
+    """Serializer for audiobook objects"""
+
+    genres = serializers.StringRelatedField(many=True, read_only=True)
+    tracks = TrackSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = AudioBook
+        fields = ('id', 'title', 'word_count', 'estimated_length_in_seconds',
+                  'price', 'slug', 'created', 'updated', 'genres', 'tracks')
+        read_only_fields = ('id', 'slug', 'created', 'updated')
+
+
+class AlbumSerializer(serializers.ModelSerializer):
+    """Serializer for album objects"""
+
+    genres = serializers.StringRelatedField(many=True, read_only=True)
+    tracks = TrackSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Album
+        fields = ('id', 'name', 'album_type', 'estimated_length_in_seconds',
+                  'popularity', 'price', 'release_date', 'slug', 'created',
+                  'updated', 'genres', 'tracks')
+        read_only_fields = ('id', 'slug', 'created', 'updated')
