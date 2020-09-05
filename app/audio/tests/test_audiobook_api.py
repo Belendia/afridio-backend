@@ -91,7 +91,7 @@ class PrivateAudioBooksApiTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
-    def test_create_audiobook_successful(self):
+    def test_create_audiobook(self):
         """Test create a new audiobook"""
 
         payload = {
@@ -100,13 +100,65 @@ class PrivateAudioBooksApiTest(TestCase):
             'estimated_length_in_seconds': 25000,
             'price': 12.50
         }
-        self.client.post(AUDIOBOOK_URL, payload)
 
-        exists = AudioBook.objects.filter(
-            title=payload['title']
-        ).exists()
+        res = self.client.post(AUDIOBOOK_URL, payload)
 
-        self.assertTrue(exists)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        audiobook = AudioBook.objects.get(id=res.data['id'])
+
+        for key in payload.keys():
+            self.assertEqual(payload[key], getattr(audiobook, key))
+
+    def test_create_audiobook_with_genres(self):
+        """Test creating audiobooks with genre"""
+
+        genre1 = sample_genre(user=self.user, name='Fiction')
+        genre2 = sample_genre(user=self.user, name='Fantasy')
+
+        payload = {
+            'title': 'The new audiobook',
+            'word_count': 16512,
+            'estimated_length_in_seconds': 30000,
+            'price': 20.50,
+            'genres': [genre1.id, genre2.id]
+        }
+
+        res = self.client.post(AUDIOBOOK_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        audiobook = AudioBook.objects.get(id=res.data['id'])
+        genres = audiobook.genres.all()
+
+        self.assertEqual(genres.count(), 2)
+        self.assertIn(genre1, genres)
+        self.assertIn(genre2, genres)
+
+    def test_create_audiobook_with_tracks(self):
+        """Test creating audiobooks with tracks"""
+
+        track1 = sample_track(user=self.user, name='Track 01')
+        track2 = sample_track(user=self.user, name='Track 02')
+
+        payload = {
+            'title': 'The new audiobook',
+            'word_count': 16512,
+            'estimated_length_in_seconds': 30000,
+            'price': 20.50,
+            'tracks': [track1.id, track2.id]
+        }
+
+        res = self.client.post(AUDIOBOOK_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        audiobook = AudioBook.objects.get(id=res.data['id'])
+        tracks = audiobook.tracks.all()
+
+        self.assertEqual(tracks.count(), 2)
+        self.assertIn(track1, tracks)
+        self.assertIn(track2, tracks)
 
     def test_create_audiobook_invalid(self):
         """Test creating invalid audiobook fails"""

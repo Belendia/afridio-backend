@@ -93,8 +93,11 @@ class PrivateAlbumsApiTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
 
-    def test_create_album_successful(self):
-        """Test create a new album"""
+    def test_create_album_with_genres(self):
+        """Test creating album with genre"""
+
+        genre1 = sample_genre(user=self.user, name='Rock')
+        genre2 = sample_genre(user=self.user, name='Funk')
 
         payload = {
             'name': 'Sample album',
@@ -102,15 +105,47 @@ class PrivateAlbumsApiTest(TestCase):
             'estimated_length_in_seconds': 25525,
             'popularity': 35,
             'price': 12.50,
-            'release_date': '2020-09-04'
+            'release_date': '2020-09-04',
+            'genres': [genre1.id, genre2.id]
         }
-        self.client.post(ALBUMS_URL, payload)
 
-        exists = Album.objects.filter(
-            name=payload['name']
-        ).exists()
+        res = self.client.post(ALBUMS_URL, payload)
 
-        self.assertTrue(exists)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        album = Album.objects.get(id=res.data['id'])
+        genres = album.genres.all()
+
+        self.assertEqual(genres.count(), 2)
+        self.assertIn(genre1, genres)
+        self.assertIn(genre2, genres)
+
+    def test_create_album_with_tracks(self):
+        """Test creating albums with tracks"""
+
+        track1 = sample_track(user=self.user, name='Track 01')
+        track2 = sample_track(user=self.user, name='Track 02')
+
+        payload = {
+            'name': 'Sample album',
+            'album_type': 'ALBUM',
+            'estimated_length_in_seconds': 25525,
+            'popularity': 35,
+            'price': 12.50,
+            'release_date': '2020-09-04',
+            'tracks': [track1.id, track2.id]
+        }
+
+        res = self.client.post(ALBUMS_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+
+        album = Album.objects.get(id=res.data['id'])
+        tracks = album.tracks.all()
+
+        self.assertEqual(tracks.count(), 2)
+        self.assertIn(track1, tracks)
+        self.assertIn(track2, tracks)
 
     def test_create_album_invalid(self):
         """Test creating invalid album fails"""

@@ -25,7 +25,10 @@ class TrackSerializer(serializers.ModelSerializer):
 class AudioBookSerializer(serializers.ModelSerializer):
     """Serializer for audiobook objects"""
 
-    genres = serializers.StringRelatedField(many=True, read_only=True)
+    genres = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Genre.objects.all()
+    )
     tracks = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Track.objects.all()
@@ -48,7 +51,10 @@ class AudioBookDetailSerializer(AudioBookSerializer):
 class AlbumSerializer(serializers.ModelSerializer):
     """Serializer for album objects"""
 
-    genres = serializers.StringRelatedField(many=True, read_only=True)
+    genres = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Genre.objects.all()
+    )
     tracks = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Track.objects.all()
