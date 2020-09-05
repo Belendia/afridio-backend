@@ -5,10 +5,36 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import AudioBook
-from audio.serializers import AudioBookSerializer
+from core.models import AudioBook, Genre, Track
+from audio.serializers import AudioBookSerializer, AudioBookDetailSerializer
 
 AUDIOBOOK_URL = reverse('audio:audiobooks-list')
+
+
+def audiobook_detail_url(audiobook_id):
+    """Return audiobook detail URL"""
+
+    return reverse('audio:audiobooks-detail', args=[audiobook_id])
+
+
+def sample_genre(user, name='Fiction'):
+    """Create and return a sample genre"""
+
+    return Genre.objects.create(user=user, name=name)
+
+
+def sample_track(user, **params):
+    """Create and return a sample track"""
+
+    defaults = {
+        'name': 'Track 01',
+        'popularity': 10,
+        'duration_ms': 2500
+    }
+
+    defaults.update(params)
+
+    return Track.objects.create(user=user, **defaults)
 
 
 def sample_audiobook(user, **params):
@@ -91,3 +117,17 @@ class PrivateAudioBooksApiTest(TestCase):
         res = self.client.post(AUDIOBOOK_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_view_audiobook_detail(self):
+        """Test viewing a audiobook detail"""
+
+        audiobook = sample_audiobook(user=self.user)
+        audiobook.genres.add(sample_genre(user=self.user))
+        audiobook.tracks.add(sample_track(user=self.user))
+
+        url = audiobook_detail_url(audiobook.id)
+
+        res = self.client.get(url)
+
+        serializer = AudioBookDetailSerializer(audiobook)
+        self.assertEqual(res.data, serializer.data)

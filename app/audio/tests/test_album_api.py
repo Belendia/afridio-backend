@@ -5,10 +5,36 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Album
-from audio.serializers import AlbumSerializer
+from core.models import Album, Genre, Track
+from audio.serializers import AlbumSerializer, AlbumDetailSerializer
 
 ALBUMS_URL = reverse('audio:albums-list')
+
+
+def album_detail_url(audiobook_id):
+    """Return album detail URL"""
+
+    return reverse('audio:albums-detail', args=[audiobook_id])
+
+
+def sample_genre(user, name='Fiction'):
+    """Create and return a sample genre"""
+
+    return Genre.objects.create(user=user, name=name)
+
+
+def sample_track(user, **params):
+    """Create and return a sample track"""
+
+    defaults = {
+        'name': 'Track 01',
+        'popularity': 10,
+        'duration_ms': 2500
+    }
+
+    defaults.update(params)
+
+    return Track.objects.create(user=user, **defaults)
 
 
 def sample_album(user, **params):
@@ -95,3 +121,16 @@ class PrivateAlbumsApiTest(TestCase):
         res = self.client.post(ALBUMS_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_view_album_detail(self):
+        """Test viewing a album detail"""
+
+        album = sample_album(user=self.user)
+        album.genres.add(sample_genre(user=self.user))
+        album.tracks.add(sample_track(user=self.user))
+
+        url = album_detail_url(album.id)
+        res = self.client.get(url)
+
+        serializer = AlbumDetailSerializer(album)
+        self.assertEqual(res.data, serializer.data)

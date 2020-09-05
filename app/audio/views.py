@@ -52,6 +52,14 @@ class AudioBookViewSet(viewsets.ModelViewSet):
 
         serializer.save(user=self.request.user)
 
+    def get_serializer_class(self):
+        """Return appropriate serializer class"""
+
+        if self.action == 'retrieve':
+            return serializers.AudioBookDetailSerializer
+
+        return self.serializer_class
+
     # def get_queryset(self):
     #     """Retrieves the audiobooks for the current authenticated user"""
     #
@@ -70,6 +78,14 @@ class AlbumViewSet(viewsets.ModelViewSet):
         """Create a new object"""
 
         serializer.save(user=self.request.user)
+
+    def get_serializer_class(self):
+        """Return appropriate serializer class"""
+
+        if self.action == 'retrieve':
+            return serializers.AlbumDetailSerializer
+
+        return self.serializer_class
 
     # def get_queryset(self):
     #     """Retrieves the albums for the current authenticated user"""

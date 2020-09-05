@@ -26,7 +26,10 @@ class AudioBookSerializer(serializers.ModelSerializer):
     """Serializer for audiobook objects"""
 
     genres = serializers.StringRelatedField(many=True, read_only=True)
-    tracks = TrackSerializer(many=True, read_only=True)
+    tracks = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Track.objects.all()
+    )
 
     class Meta:
         model = AudioBook
@@ -35,11 +38,21 @@ class AudioBookSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'slug', 'created', 'updated')
 
 
+class AudioBookDetailSerializer(AudioBookSerializer):
+    """Serializer an audiobook detail"""
+
+    genres = GenreSerializer(many=True, read_only=True)
+    tracks = TrackSerializer(many=True, read_only=True)
+
+
 class AlbumSerializer(serializers.ModelSerializer):
     """Serializer for album objects"""
 
     genres = serializers.StringRelatedField(many=True, read_only=True)
-    tracks = TrackSerializer(many=True, read_only=True)
+    tracks = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Track.objects.all()
+    )
 
     class Meta:
         model = Album
@@ -47,3 +60,10 @@ class AlbumSerializer(serializers.ModelSerializer):
                   'popularity', 'price', 'release_date', 'slug', 'created',
                   'updated', 'genres', 'tracks')
         read_only_fields = ('id', 'slug', 'created', 'updated')
+
+
+class AlbumDetailSerializer(AlbumSerializer):
+    """Serializer an album detail"""
+
+    genres = GenreSerializer(many=True, read_only=True)
+    tracks = TrackSerializer(many=True, read_only=True)
