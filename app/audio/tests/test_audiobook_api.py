@@ -183,3 +183,49 @@ class PrivateAudioBooksApiTest(TestCase):
 
         serializer = AudioBookDetailSerializer(audiobook)
         self.assertEqual(res.data, serializer.data)
+
+    def test_partial_update_audiobook(self):
+        """Test updating an audiobook with patch"""
+
+        audiobook = sample_audiobook(user=self.user)
+        audiobook.genres.add(sample_genre(user=self.user))
+        new_genre = sample_genre(user=self.user, name='Novel')
+
+        payload = {
+            'title': 'Why We Sleep',
+            'genres': [new_genre.id]
+        }
+
+        url = audiobook_detail_url(audiobook.id)
+        self.client.patch(url, payload)
+
+        audiobook.refresh_from_db()
+
+        self.assertEqual(audiobook.title, payload['title'])
+        genres = audiobook.genres.all()
+
+        self.assertEqual(len(genres), 1)
+        self.assertIn(new_genre, genres)
+
+    def test_full_update_audiobook(self):
+        """Test updating an audiobook with put"""
+
+        audiobook = sample_audiobook(user=self.user)
+        audiobook.genres.add(sample_genre(user=self.user))
+
+        payload = {
+            'title': 'Why We Sleep',
+            'word_count': 16512,
+            'estimated_length_in_seconds': 3029,
+            'price': 20.50,
+        }
+
+        url = audiobook_detail_url(audiobook.id)
+        self.client.put(url, payload)
+
+        audiobook.refresh_from_db()
+        self.assertEqual(audiobook.title, payload['title'])
+        self.assertEqual(audiobook.word_count, payload['word_count'])
+        self.assertEqual(audiobook.price, payload['price'])
+        genres = audiobook.genres.all()
+        self.assertEqual(len(genres), 0)
