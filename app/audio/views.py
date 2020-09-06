@@ -86,10 +86,27 @@ class AudioBookViewSet(viewsets.ModelViewSet):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # def get_queryset(self):
-    #     """Retrieves the audiobooks for the current authenticated user"""
-    #
-    #     return self.queryset.filter(user=self.request.user)
+    def _params_to_ints(self, qs):
+        """Convert a list of string IDs to a list of integers"""
+
+        return [int(str_id) for str_id in qs.split(',')]
+
+    def get_queryset(self):
+        """Retrieves the audiobooks for the current authenticated user"""
+
+        genres = self.request.query_params.get('genres')
+        tracks = self.request.query_params.get('tracks')
+        queryset = self.queryset
+
+        if genres:
+            genre_ids = self._params_to_ints(genres)
+            queryset = queryset.filter(genres__id__in=genre_ids)
+
+        if tracks:
+            track_ids = self._params_to_ints(tracks)
+            queryset = queryset.filter(tracks__id__in=track_ids)
+
+        return queryset  # .filter(user=self.request.user)
 
 
 class AlbumViewSet(viewsets.ModelViewSet):
@@ -137,7 +154,24 @@ class AlbumViewSet(viewsets.ModelViewSet):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # def get_queryset(self):
-    #     """Retrieves the albums for the current authenticated user"""
-    #
-    #     return self.queryset.filter(user=self.request.user)
+    def _params_to_ints(self, qs):
+        """Convert a list of string IDs to a list of integers"""
+
+        return [int(str_id) for str_id in qs.split(',')]
+
+    def get_queryset(self):
+        """Retrieves the albums for the current authenticated user"""
+
+        genres = self.request.query_params.get('genres')
+        tracks = self.request.query_params.get('tracks')
+        queryset = self.queryset
+
+        if genres:
+            genre_ids = self._params_to_ints(genres)
+            queryset = queryset.filter(genres__id__in=genre_ids)
+
+        if tracks:
+            track_ids = self._params_to_ints(tracks)
+            queryset = queryset.filter(tracks__id__in=track_ids)
+
+        return queryset  # .filter(user=self.request.user)

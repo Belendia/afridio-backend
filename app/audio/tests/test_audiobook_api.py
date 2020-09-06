@@ -279,3 +279,57 @@ class AudioBookImageUploadTest(TestCase):
         res = self.client.post(url, {'image': 'notimage'}, format='multipart')
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_filter_audiobook_by_genres(self):
+        """Test returning audiobooks with specific genres"""
+
+        audiobook1 = sample_audiobook(user=self.user, title='Book 1')
+        audiobook2 = sample_audiobook(user=self.user, title='Book 2')
+
+        genre1 = sample_genre(user=self.user, name='Fiction')
+        genre2 = sample_genre(user=self.user, name='Novel')
+
+        audiobook1.genres.add(genre1)
+        audiobook2.genres.add(genre2)
+
+        audiobook3 = sample_audiobook(user=self.user, title='Book 3')
+
+        res = self.client.get(
+            AUDIOBOOK_URL,
+            {'genres': f'{genre1.id}, {genre2.id}'}
+        )
+
+        serializer1 = AudioBookSerializer(audiobook1)
+        serializer2 = AudioBookSerializer(audiobook2)
+        serializer3 = AudioBookSerializer(audiobook3)
+
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)
+
+    def test_filter_audiobook_by_tracks(self):
+        """Test returning audiobooks with specific tracks"""
+
+        audiobook1 = sample_audiobook(user=self.user, title='Book 1')
+        audiobook2 = sample_audiobook(user=self.user, title='Book 2')
+
+        track1 = sample_track(user=self.user, name='Track 01')
+        track2 = sample_track(user=self.user, name='Track 02')
+
+        audiobook1.tracks.add(track1)
+        audiobook2.tracks.add(track2)
+
+        audiobook3 = sample_audiobook(user=self.user, title='Book 3')
+
+        res = self.client.get(
+            AUDIOBOOK_URL,
+            {'tracks': f'{track1.id}, {track2.id}'}
+        )
+
+        serializer1 = AudioBookSerializer(audiobook1)
+        serializer2 = AudioBookSerializer(audiobook2)
+        serializer3 = AudioBookSerializer(audiobook3)
+
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)

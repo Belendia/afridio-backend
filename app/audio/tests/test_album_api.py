@@ -219,3 +219,57 @@ class AlbumImageUploadTest(TestCase):
         res = self.client.post(url, {'image': 'notimage'}, format='multipart')
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_filter_album_by_genres(self):
+        """Test returning albums with specific genres"""
+
+        album1 = sample_album(user=self.user, name='Music 1')
+        album2 = sample_album(user=self.user, name='Music 2')
+
+        genre1 = sample_genre(user=self.user, name='Rock')
+        genre2 = sample_genre(user=self.user, name='Jazz')
+
+        album1.genres.add(genre1)
+        album2.genres.add(genre2)
+
+        album3 = sample_album(user=self.user, name='Music 3')
+
+        res = self.client.get(
+            ALBUMS_URL,
+            {'genres': f'{genre1.id}, {genre2.id}'}
+        )
+
+        serializer1 = AlbumSerializer(album1)
+        serializer2 = AlbumSerializer(album2)
+        serializer3 = AlbumSerializer(album3)
+
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)
+
+    def test_filter_album_by_tracks(self):
+        """Test returning albums with specific tracks"""
+
+        album1 = sample_album(user=self.user, name='Music 1')
+        album2 = sample_album(user=self.user, name='Music 2')
+
+        track1 = sample_track(user=self.user, name='Track 01')
+        track2 = sample_track(user=self.user, name='Track 02')
+
+        album1.tracks.add(track1)
+        album2.tracks.add(track2)
+
+        album3 = sample_album(user=self.user, name='Music 3')
+
+        res = self.client.get(
+            ALBUMS_URL,
+            {'tracks': f'{track1.id}, {track2.id}'}
+        )
+
+        serializer1 = AlbumSerializer(album1)
+        serializer2 = AlbumSerializer(album2)
+        serializer3 = AlbumSerializer(album3)
+
+        self.assertIn(serializer1.data, res.data)
+        self.assertIn(serializer2.data, res.data)
+        self.assertNotIn(serializer3.data, res.data)
