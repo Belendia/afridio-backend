@@ -21,6 +21,24 @@ class BaseViewSet(viewsets.GenericViewSet,
 
         serializer.save(user=self.request.user)
 
+    def get_queryset(self):
+        """Return filtered objects"""
+
+        audiobook_assigned_only = bool(
+            int(self.request.query_params.get('audiobook_assigned_only', 0))
+        )
+        album_assigned_only = bool(
+            int(self.request.query_params.get('album_assigned_only', 0))
+        )
+
+        queryset = self.queryset
+        if audiobook_assigned_only:
+            queryset = queryset.filter(audiobook__isnull=False).distinct()
+        elif album_assigned_only:
+            queryset = queryset.filter(album__isnull=False).distinct()
+
+        return queryset
+
 
 class GenreViewSet(BaseViewSet):
     """Manage genres in the database"""
