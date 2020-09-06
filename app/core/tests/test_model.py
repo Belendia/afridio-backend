@@ -1,4 +1,5 @@
 from datetime import datetime
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.contrib.auth import get_user_model
@@ -102,3 +103,27 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(album), album.name)
+
+    @patch('uuid.uuid4')
+    def test_audiobook_file_name_uuid(self, mock_uuid):
+        """Test that image is saved in the correct location"""
+
+        uuid = 'test-uuid'
+        mock_uuid.return_value = uuid
+
+        file_path = models.audiobook_image_file_path(None, 'myimage.jpg')
+
+        expected_path = f'uploads/audiobook/{uuid}.jpg'
+        self.assertEqual(file_path, expected_path)
+
+    @patch('uuid.uuid4')
+    def test_album_file_name_uuid(self, mock_uuid):
+        """Test that image is saved in the correct location"""
+
+        uuid = 'test-uuid'
+        mock_uuid.return_value = uuid
+
+        file_path = models.album_image_file_path(None, 'myimage.jpg')
+
+        expected_path = f'uploads/album/{uuid}.jpg'
+        self.assertEqual(file_path, expected_path)

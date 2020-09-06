@@ -1,3 +1,5 @@
+import os
+import uuid
 from enum import Enum
 from secrets import token_urlsafe
 from django.db import models
@@ -6,6 +8,24 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
 from django.conf import settings
 from django.db.models.signals import pre_save
 from django.utils.text import slugify
+
+
+def audiobook_image_file_path(instance, filename):
+    """Generate file path for new audiobook cover image"""
+
+    ext = filename.split('.')[-1]
+    filename = f'{uuid.uuid4()}.{ext}'
+
+    return os.path.join('uploads/audiobook/', filename)
+
+
+def album_image_file_path(instance, filename):
+    """Generate file path for new album cover image"""
+
+    ext = filename.split('.')[-1]
+    filename = f'{uuid.uuid4()}.{ext}'
+
+    return os.path.join('uploads/album/', filename)
 
 
 class UserManager(BaseUserManager):
@@ -90,6 +110,7 @@ class AudioBook(models.Model):
     word_count = models.PositiveIntegerField()
     estimated_length_in_seconds = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
+    image = models.ImageField(null=True, upload_to=audiobook_image_file_path)
     slug = models.SlugField(blank=True, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -126,6 +147,7 @@ class Album(models.Model):
     popularity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
     release_date = models.DateField()
+    image = models.ImageField(null=True, upload_to=album_image_file_path)
     slug = models.SlugField(blank=True, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
