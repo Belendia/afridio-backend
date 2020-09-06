@@ -1,3 +1,7 @@
+import os
+import tempfile
+from PIL import Image
+
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.test import TestCase
@@ -9,6 +13,11 @@ from core.models import AudioBook, Genre, Track
 from audio.serializers import AudioBookSerializer, AudioBookDetailSerializer
 
 AUDIOBOOK_URL = reverse('audio:audiobooks-list')
+
+
+def image_upload_url(audiobook_id):
+    """Return URL for audiobook image upload"""
+    return reverse('audio:audiobooks-image', args=[audiobook_id])
 
 
 def audiobook_detail_url(audiobook_id):
@@ -229,3 +238,44 @@ class PrivateAudioBooksApiTest(TestCase):
         self.assertEqual(audiobook.price, payload['price'])
         genres = audiobook.genres.all()
         self.assertEqual(len(genres), 0)
+
+
+class AudioBookImageUploadTest(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            'test@habeltech.com',
+            'testpass'
+        )
+        self.client.force_authenticate(self.user)
+        self.audiobook = sample_audiobook(user=self.user)
+
+    def tearDown(self):
+        """Remove all the test files we create to clean up our system"""
+
+        self.audiobook.image.delete()
+
+    def test_upload_image_to_audiobook(self):
+        """Test uploading an image to audiobook"""
+
+        url = image_upload_url(self.audiobook.id)
+        with tempfile.NamedTemporaryFile(suffix='.jpg') as ntf:
+            img = Image.new('RGB', (10, 10))  # creates black square image
+            img.save(ntf, format='JPEG')
+            ntf.seek(0)
+            res = self.client.post(url, {'image': ntf}, format='multipart')
+
+        self.audiobook.refresh_from_db()
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn('image', res.data)
+        self.assertTrue(os.path.exists(self.audiobook.image.path))
+
+    def test_upload_image_bad_request(self):
+        """Test uploading an invalid image"""
+
+        url = image_upload_url(self.audiobook.id)
+        res = self.client.post(url, {'image': 'notimage'}, format='multipart')
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)

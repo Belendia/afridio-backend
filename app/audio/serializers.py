@@ -37,7 +37,8 @@ class AudioBookSerializer(serializers.ModelSerializer):
     class Meta:
         model = AudioBook
         fields = ('id', 'title', 'word_count', 'estimated_length_in_seconds',
-                  'price', 'slug', 'created', 'updated', 'genres', 'tracks')
+                  'price', 'image', 'slug', 'created', 'updated', 'genres',
+                  'tracks')
         read_only_fields = ('id', 'slug', 'created', 'updated')
 
 
@@ -63,8 +64,8 @@ class AlbumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Album
         fields = ('id', 'name', 'album_type', 'estimated_length_in_seconds',
-                  'popularity', 'price', 'release_date', 'slug', 'created',
-                  'updated', 'genres', 'tracks')
+                  'popularity', 'price', 'release_date', 'image', 'slug',
+                  'created', 'updated', 'genres', 'tracks')
         read_only_fields = ('id', 'slug', 'created', 'updated')
 
 
@@ -73,3 +74,21 @@ class AlbumDetailSerializer(AlbumSerializer):
 
     genres = GenreSerializer(many=True, read_only=True)
     tracks = TrackSerializer(many=True, read_only=True)
+
+
+class AudioBookImageSerializer(serializers.ModelSerializer):
+    """Serializer for uploading images to audio books"""
+
+    class Meta:
+        model = AudioBook
+        fields = ('id', 'image')
+        read_only_fields = ('id', )
+
+
+class AlbumImageSerializer(serializers.ModelSerializer):
+    """Serializer for uploading images to albums"""
+
+    class Meta:
+        model = Album
+        fields = ('id', 'image')
+        read_only_fields = ('id', )

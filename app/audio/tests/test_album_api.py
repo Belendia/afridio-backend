@@ -1,3 +1,7 @@
+import os
+import tempfile
+from PIL import Image
+
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.test import TestCase
@@ -11,10 +15,15 @@ from audio.serializers import AlbumSerializer, AlbumDetailSerializer
 ALBUMS_URL = reverse('audio:albums-list')
 
 
-def album_detail_url(audiobook_id):
+def image_upload_url(album_id):
+    """Return URL for album image upload"""
+    return reverse('audio:albums-image', args=[album_id])
+
+
+def album_detail_url(album_id):
     """Return album detail URL"""
 
-    return reverse('audio:albums-detail', args=[audiobook_id])
+    return reverse('audio:albums-detail', args=[album_id])
 
 
 def sample_genre(user, name='Fiction'):
@@ -169,3 +178,44 @@ class PrivateAlbumsApiTest(TestCase):
 
         serializer = AlbumDetailSerializer(album)
         self.assertEqual(res.data, serializer.data)
+
+
+class AlbumImageUploadTest(TestCase):
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create_user(
+            'test@habeltech.com',
+            'testpass'
+        )
+        self.client.force_authenticate(self.user)
+        self.album = sample_album(user=self.user)
+
+    def tearDown(self):
+        """Remove all the test files we create to clean up our system"""
+
+        self.album.image.delete()
+
+    def test_upload_image_to_album(self):
+        """Test uploading an image to album"""
+
+        url = image_upload_url(self.album.id)
+        with tempfile.NamedTemporaryFile(suffix='.jpg') as ntf:
+            img = Image.new('RGB', (10, 10))  # creates black square image
+            img.save(ntf, format='JPEG')
+            ntf.seek(0)
+            res = self.client.post(url, {'image': ntf}, format='multipart')
+
+        self.album.refresh_from_db()
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn('image', res.data)
+        self.assertTrue(os.path.exists(self.album.image.path))
+
+    def test_upload_image_bad_request(self):
+        """Test uploading an invalid image"""
+
+        url = image_upload_url(self.album.id)
+        res = self.client.post(url, {'image': 'notimage'}, format='multipart')
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
