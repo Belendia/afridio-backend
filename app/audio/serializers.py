@@ -8,8 +8,9 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        fields = ('id', 'name', 'slug', 'created', 'updated')
+        fields = ('slug', 'name', 'created', 'updated')
         read_only_fields = ('id', 'slug', 'created', 'updated')
+        lookup_field = 'slug'
 
 
 class TrackSerializer(serializers.ModelSerializer):
@@ -17,29 +18,32 @@ class TrackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Track
-        fields = ('id', 'name', 'popularity', 'original_url',
-                  'duration_ms', 'slug', 'created', 'updated')
+        fields = ('slug', 'name', 'popularity', 'original_url',
+                  'duration_ms', 'created', 'updated')
         read_only_fields = ('id', 'slug', 'original_url', 'created', 'updated')
+        lookup_field = 'slug'
 
 
 class AudioBookSerializer(serializers.ModelSerializer):
     """Serializer for audiobook objects"""
 
-    genres = serializers.PrimaryKeyRelatedField(
+    genres = serializers.SlugRelatedField(
         many=True,
+        slug_field='slug',
         queryset=Genre.objects.all()
     )
-    tracks = serializers.PrimaryKeyRelatedField(
+    tracks = serializers.SlugRelatedField(
         many=True,
+        slug_field='slug',
         queryset=Track.objects.all()
     )
 
     class Meta:
         model = AudioBook
-        fields = ('id', 'title', 'word_count', 'estimated_length_in_seconds',
-                  'price', 'image', 'slug', 'created', 'updated', 'genres',
-                  'tracks')
+        fields = ('slug', 'title', 'word_count', 'estimated_length_in_seconds',
+                  'price', 'image', 'created', 'updated', 'genres', 'tracks')
         read_only_fields = ('id', 'slug', 'created', 'updated')
+        lookup_field = 'slug'
 
 
 class AudioBookDetailSerializer(AudioBookSerializer):
@@ -52,21 +56,24 @@ class AudioBookDetailSerializer(AudioBookSerializer):
 class AlbumSerializer(serializers.ModelSerializer):
     """Serializer for album objects"""
 
-    genres = serializers.PrimaryKeyRelatedField(
+    genres = serializers.SlugRelatedField(
         many=True,
+        slug_field='slug',
         queryset=Genre.objects.all()
     )
-    tracks = serializers.PrimaryKeyRelatedField(
+    tracks = serializers.SlugRelatedField(
         many=True,
+        slug_field='slug',
         queryset=Track.objects.all()
     )
 
     class Meta:
         model = Album
-        fields = ('id', 'name', 'album_type', 'estimated_length_in_seconds',
-                  'popularity', 'price', 'release_date', 'image', 'slug',
-                  'created', 'updated', 'genres', 'tracks')
+        fields = ('slug', 'name', 'album_type', 'estimated_length_in_seconds',
+                  'popularity', 'price', 'release_date', 'image', 'created',
+                  'updated', 'genres', 'tracks')
         read_only_fields = ('id', 'slug', 'created', 'updated')
+        lookup_field = 'slug'
 
 
 class AlbumDetailSerializer(AlbumSerializer):
@@ -81,8 +88,9 @@ class AudioBookImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AudioBook
-        fields = ('id', 'image')
-        read_only_fields = ('id', )
+        fields = ('slug', 'image')
+        read_only_fields = ('slug', )
+        lookup_field = 'slug'
 
 
 class AlbumImageSerializer(serializers.ModelSerializer):
@@ -90,5 +98,6 @@ class AlbumImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Album
-        fields = ('id', 'image')
-        read_only_fields = ('id', )
+        fields = ('slug', 'image')
+        read_only_fields = ('slug', )
+        lookup_field = 'slug'

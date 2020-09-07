@@ -15,6 +15,7 @@ class BaseViewSet(viewsets.GenericViewSet,
 
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+    lookup_field = 'slug'
 
     def perform_create(self, serializer):
         """Create a new object"""
@@ -66,6 +67,7 @@ class AudioBookViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AudioBookSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+    lookup_field = 'slug'
 
     def perform_create(self, serializer):
         """Create a new object"""
@@ -83,7 +85,7 @@ class AudioBookViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
     @action(methods=['POST'], detail=True, url_path='image')
-    def image(self, request, pk=None, version=None,):
+    def image(self, request, slug=None, version=None,):
         """Upload an image to an album"""
 
         audiobook = self.get_object()
@@ -104,10 +106,10 @@ class AudioBookViewSet(viewsets.ModelViewSet):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    def _params_to_ints(self, qs):
+    def _params_to_slugs(self, qs):
         """Convert a list of string IDs to a list of integers"""
 
-        return [int(str_id) for str_id in qs.split(',')]
+        return [str_id for str_id in qs.split(',')]
 
     def get_queryset(self):
         """Retrieves the audiobooks for the current authenticated user"""
@@ -117,12 +119,12 @@ class AudioBookViewSet(viewsets.ModelViewSet):
         queryset = self.queryset
 
         if genres:
-            genre_ids = self._params_to_ints(genres)
-            queryset = queryset.filter(genres__id__in=genre_ids)
+            genre_slugs = self._params_to_slugs(genres)
+            queryset = queryset.filter(genres__slug__in=genre_slugs)
 
         if tracks:
-            track_ids = self._params_to_ints(tracks)
-            queryset = queryset.filter(tracks__id__in=track_ids)
+            track_slugs = self._params_to_slugs(tracks)
+            queryset = queryset.filter(tracks__slug__in=track_slugs)
 
         return queryset  # .filter(user=self.request.user)
 
@@ -134,6 +136,7 @@ class AlbumViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AlbumSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+    lookup_field = 'slug'
 
     def perform_create(self, serializer):
         """Create a new object"""
@@ -151,7 +154,7 @@ class AlbumViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
     @action(methods=['POST'], detail=True, url_path='image')
-    def image(self, request, pk=None, version=None):
+    def image(self, request, slug=None, version=None):
         """Upload an image to an album"""
 
         album = self.get_object()
@@ -172,10 +175,10 @@ class AlbumViewSet(viewsets.ModelViewSet):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    def _params_to_ints(self, qs):
-        """Convert a list of string IDs to a list of integers"""
+    def _params_to_list(self, qs):
+        """Convert a list of string Slugs to a list of integers"""
 
-        return [int(str_id) for str_id in qs.split(',')]
+        return [str_id for str_id in qs.split(',')]
 
     def get_queryset(self):
         """Retrieves the albums for the current authenticated user"""
@@ -185,11 +188,11 @@ class AlbumViewSet(viewsets.ModelViewSet):
         queryset = self.queryset
 
         if genres:
-            genre_ids = self._params_to_ints(genres)
-            queryset = queryset.filter(genres__id__in=genre_ids)
+            genre_slugs = self._params_to_list(genres)
+            queryset = queryset.filter(genres__slug__in=genre_slugs)
 
         if tracks:
-            track_ids = self._params_to_ints(tracks)
-            queryset = queryset.filter(tracks__id__in=track_ids)
+            track_slugs = self._params_to_list(tracks)
+            queryset = queryset.filter(tracks__slug__in=track_slugs)
 
         return queryset  # .filter(user=self.request.user)

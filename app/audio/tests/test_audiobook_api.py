@@ -15,17 +15,17 @@ from audio.serializers import AudioBookSerializer, AudioBookDetailSerializer
 AUDIOBOOK_URL = reverse('audio:audiobooks-list', kwargs={"version": "v1"})
 
 
-def image_upload_url(audiobook_id):
+def image_upload_url(audiobook_slug):
     """Return URL for audiobook image upload"""
     return reverse('audio:audiobooks-image',
-                   kwargs={'pk': audiobook_id, 'version': 'v1'})
+                   kwargs={'slug': audiobook_slug, 'version': 'v1'})
 
 
-def audiobook_detail_url(audiobook_id):
+def audiobook_detail_url(audiobook_slug):
     """Return audiobook detail URL"""
 
     return reverse('audio:audiobooks-detail',
-                   kwargs={'pk': audiobook_id, 'version': 'v1'})
+                   kwargs={'slug': audiobook_slug, 'version': 'v1'})
 
 
 def sample_genre(user, name='Fiction'):
@@ -116,7 +116,7 @@ class PrivateAudioBooksApiTest(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-        audiobook = AudioBook.objects.get(id=res.data['id'])
+        audiobook = AudioBook.objects.get(slug=res.data['slug'])
 
         for key in payload.keys():
             self.assertEqual(payload[key], getattr(audiobook, key))
@@ -132,14 +132,14 @@ class PrivateAudioBooksApiTest(TestCase):
             'word_count': 16512,
             'estimated_length_in_seconds': 30000,
             'price': 20.50,
-            'genres': [genre1.id, genre2.id]
+            'genres': [genre1.slug, genre2.slug]
         }
 
         res = self.client.post(AUDIOBOOK_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-        audiobook = AudioBook.objects.get(id=res.data['id'])
+        audiobook = AudioBook.objects.get(slug=res.data['slug'])
         genres = audiobook.genres.all()
 
         self.assertEqual(genres.count(), 2)
@@ -157,14 +157,14 @@ class PrivateAudioBooksApiTest(TestCase):
             'word_count': 16512,
             'estimated_length_in_seconds': 30000,
             'price': 20.50,
-            'tracks': [track1.id, track2.id]
+            'tracks': [track1.slug, track2.slug]
         }
 
         res = self.client.post(AUDIOBOOK_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-        audiobook = AudioBook.objects.get(id=res.data['id'])
+        audiobook = AudioBook.objects.get(slug=res.data['slug'])
         tracks = audiobook.tracks.all()
 
         self.assertEqual(tracks.count(), 2)
@@ -188,7 +188,7 @@ class PrivateAudioBooksApiTest(TestCase):
         audiobook.genres.add(sample_genre(user=self.user))
         audiobook.tracks.add(sample_track(user=self.user))
 
-        url = audiobook_detail_url(audiobook.id)
+        url = audiobook_detail_url(audiobook.slug)
 
         res = self.client.get(url)
 
@@ -204,10 +204,10 @@ class PrivateAudioBooksApiTest(TestCase):
 
         payload = {
             'title': 'Why We Sleep',
-            'genres': [new_genre.id]
+            'genres': [new_genre.slug]
         }
 
-        url = audiobook_detail_url(audiobook.id)
+        url = audiobook_detail_url(audiobook.slug)
         self.client.patch(url, payload)
 
         audiobook.refresh_from_db()
@@ -231,7 +231,7 @@ class PrivateAudioBooksApiTest(TestCase):
             'price': 20.50,
         }
 
-        url = audiobook_detail_url(audiobook.id)
+        url = audiobook_detail_url(audiobook.slug)
         self.client.put(url, payload)
 
         audiobook.refresh_from_db()
@@ -261,7 +261,7 @@ class AudioBookImageUploadTest(TestCase):
     def test_upload_image_to_audiobook(self):
         """Test uploading an image to audiobook"""
 
-        url = image_upload_url(self.audiobook.id)
+        url = image_upload_url(self.audiobook.slug)
         with tempfile.NamedTemporaryFile(suffix='.jpg') as ntf:
             img = Image.new('RGB', (10, 10))  # creates black square image
             img.save(ntf, format='JPEG')
@@ -277,7 +277,7 @@ class AudioBookImageUploadTest(TestCase):
     def test_upload_image_bad_request(self):
         """Test uploading an invalid image"""
 
-        url = image_upload_url(self.audiobook.id)
+        url = image_upload_url(self.audiobook.slug)
         res = self.client.post(url, {'image': 'notimage'}, format='multipart')
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -298,7 +298,7 @@ class AudioBookImageUploadTest(TestCase):
 
         res = self.client.get(
             AUDIOBOOK_URL,
-            {'genres': f'{genre1.id}, {genre2.id}'}
+            {'genres': f'{genre1.slug},{genre2.slug}'}
         )
 
         serializer1 = AudioBookSerializer(audiobook1)
@@ -325,7 +325,7 @@ class AudioBookImageUploadTest(TestCase):
 
         res = self.client.get(
             AUDIOBOOK_URL,
-            {'tracks': f'{track1.id}, {track2.id}'}
+            {'tracks': f'{track1.slug},{track2.slug}'}
         )
 
         serializer1 = AudioBookSerializer(audiobook1)

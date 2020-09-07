@@ -15,17 +15,17 @@ from audio.serializers import AlbumSerializer, AlbumDetailSerializer
 ALBUMS_URL = reverse('audio:albums-list', kwargs={"version": "v1"})
 
 
-def image_upload_url(album_id):
+def image_upload_url(album_slug):
     """Return URL for album image upload"""
     return reverse('audio:albums-image',
-                   kwargs={'pk': album_id, 'version': 'v1'})
+                   kwargs={'slug': album_slug, 'version': 'v1'})
 
 
-def album_detail_url(album_id):
+def album_detail_url(album_slug):
     """Return album detail URL"""
 
     return reverse('audio:albums-detail',
-                   kwargs={'pk': album_id, 'version': 'v1'})
+                   kwargs={'slug': album_slug, 'version': 'v1'})
 
 
 def sample_genre(user, name='Fiction'):
@@ -117,14 +117,14 @@ class PrivateAlbumsApiTest(TestCase):
             'popularity': 35,
             'price': 12.50,
             'release_date': '2020-09-04',
-            'genres': [genre1.id, genre2.id]
+            'genres': [genre1.slug, genre2.slug]
         }
 
         res = self.client.post(ALBUMS_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-        album = Album.objects.get(id=res.data['id'])
+        album = Album.objects.get(slug=res.data['slug'])
         genres = album.genres.all()
 
         self.assertEqual(genres.count(), 2)
@@ -144,14 +144,14 @@ class PrivateAlbumsApiTest(TestCase):
             'popularity': 35,
             'price': 12.50,
             'release_date': '2020-09-04',
-            'tracks': [track1.id, track2.id]
+            'tracks': [track1.slug, track2.slug]
         }
 
         res = self.client.post(ALBUMS_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-        album = Album.objects.get(id=res.data['id'])
+        album = Album.objects.get(slug=res.data['slug'])
         tracks = album.tracks.all()
 
         self.assertEqual(tracks.count(), 2)
@@ -175,7 +175,7 @@ class PrivateAlbumsApiTest(TestCase):
         album.genres.add(sample_genre(user=self.user))
         album.tracks.add(sample_track(user=self.user))
 
-        url = album_detail_url(album.id)
+        url = album_detail_url(album.slug)
         res = self.client.get(url)
 
         serializer = AlbumDetailSerializer(album)
@@ -201,7 +201,7 @@ class AlbumImageUploadTest(TestCase):
     def test_upload_image_to_album(self):
         """Test uploading an image to album"""
 
-        url = image_upload_url(self.album.id)
+        url = image_upload_url(self.album.slug)
         with tempfile.NamedTemporaryFile(suffix='.jpg') as ntf:
             img = Image.new('RGB', (10, 10))  # creates black square image
             img.save(ntf, format='JPEG')
@@ -217,7 +217,7 @@ class AlbumImageUploadTest(TestCase):
     def test_upload_image_bad_request(self):
         """Test uploading an invalid image"""
 
-        url = image_upload_url(self.album.id)
+        url = image_upload_url(self.album.slug)
         res = self.client.post(url, {'image': 'notimage'}, format='multipart')
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
@@ -238,7 +238,7 @@ class AlbumImageUploadTest(TestCase):
 
         res = self.client.get(
             ALBUMS_URL,
-            {'genres': f'{genre1.id}, {genre2.id}'}
+            {'genres': f'{genre1.slug},{genre2.slug}'}
         )
 
         serializer1 = AlbumSerializer(album1)
@@ -265,7 +265,7 @@ class AlbumImageUploadTest(TestCase):
 
         res = self.client.get(
             ALBUMS_URL,
-            {'tracks': f'{track1.id}, {track2.id}'}
+            {'tracks': f'{track1.slug},{track2.slug}'}
         )
 
         serializer1 = AlbumSerializer(album1)
