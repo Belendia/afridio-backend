@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
-    path('v1/', include('audio.urls', namespace='v1')),
-    path('v1/user/', include('user.urls', namespace='v1')),
+    path('api/', include('audio.urls')),
+    path('api/', include('user.urls')),
     path('admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
