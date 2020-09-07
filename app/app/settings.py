@@ -132,3 +132,9 @@ STATIC_ROOT = '/vol/web/static'
 MEDIA_ROOT = '/vol/web/media'
 
 AUTH_USER_MODEL = 'core.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_VERSIONING_CLASS':
+        'rest_framework.versioning.NamespaceVersioning',
+    'DEFAULT_VERSION': 'v1',
+}
