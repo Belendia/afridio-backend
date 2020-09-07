@@ -8,7 +8,7 @@ from rest_framework.test import APIClient
 from core.models import Track
 from audio.serializers import TrackSerializer
 
-TRACKS_URL = reverse('audio:tracks-list')
+TRACKS_URL = reverse('audio:tracks-list', kwargs={"version": "v1"})
 
 
 class PublicTrackApiTests(TestCase):

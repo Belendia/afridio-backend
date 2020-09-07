@@ -12,18 +12,20 @@ from rest_framework.test import APIClient
 from core.models import AudioBook, Genre, Track
 from audio.serializers import AudioBookSerializer, AudioBookDetailSerializer
 
-AUDIOBOOK_URL = reverse('audio:audiobooks-list')
+AUDIOBOOK_URL = reverse('audio:audiobooks-list', kwargs={"version": "v1"})
 
 
 def image_upload_url(audiobook_id):
     """Return URL for audiobook image upload"""
-    return reverse('audio:audiobooks-image', args=[audiobook_id])
+    return reverse('audio:audiobooks-image',
+                   kwargs={'pk': audiobook_id, 'version': 'v1'})
 
 
 def audiobook_detail_url(audiobook_id):
     """Return audiobook detail URL"""
 
-    return reverse('audio:audiobooks-detail', args=[audiobook_id])
+    return reverse('audio:audiobooks-detail',
+                   kwargs={'pk': audiobook_id, 'version': 'v1'})
 
 
 def sample_genre(user, name='Fiction'):

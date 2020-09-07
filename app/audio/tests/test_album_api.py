@@ -12,18 +12,20 @@ from rest_framework.test import APIClient
 from core.models import Album, Genre, Track
 from audio.serializers import AlbumSerializer, AlbumDetailSerializer
 
-ALBUMS_URL = reverse('audio:albums-list')
+ALBUMS_URL = reverse('audio:albums-list', kwargs={"version": "v1"})
 
 
 def image_upload_url(album_id):
     """Return URL for album image upload"""
-    return reverse('audio:albums-image', args=[album_id])
+    return reverse('audio:albums-image',
+                   kwargs={'pk': album_id, 'version': 'v1'})
 
 
 def album_detail_url(album_id):
     """Return album detail URL"""
 
-    return reverse('audio:albums-detail', args=[album_id])
+    return reverse('audio:albums-detail',
+                   kwargs={'pk': album_id, 'version': 'v1'})
 
 
 def sample_genre(user, name='Fiction'):

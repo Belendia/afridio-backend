@@ -9,7 +9,7 @@ from core.models import Genre, AudioBook, Album
 from audio.serializers import GenreSerializer
 
 
-GENRE_URL = reverse('audio:genres-list')
+GENRE_URL = reverse('audio:genres-list', kwargs={"version": "v1"})
 
 
 class PublicGenreApiTests(TestCase):

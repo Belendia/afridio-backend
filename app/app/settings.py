@@ -135,6 +135,6 @@ AUTH_USER_MODEL = 'core.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_VERSIONING_CLASS':
-        'rest_framework.versioning.AcceptHeaderVersioning',
-    'DEFAULT_VERSION': 1.0
+        'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_VERSION': 'v1'
 }

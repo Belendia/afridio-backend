@@ -83,7 +83,7 @@ class AudioBookViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
     @action(methods=['POST'], detail=True, url_path='image')
-    def image(self, request, pk=None):
+    def image(self, request, pk=None, version=None,):
         """Upload an image to an album"""
 
         audiobook = self.get_object()
@@ -151,7 +151,7 @@ class AlbumViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
     @action(methods=['POST'], detail=True, url_path='image')
-    def image(self, request, pk=None):
+    def image(self, request, pk=None, version=None):
         """Upload an image to an album"""
 
         album = self.get_object()
