@@ -21,6 +21,13 @@ class BaseViewSet(viewsets.GenericViewSet,
 
         serializer.save(user=self.request.user)
 
+
+class GenreViewSet(BaseViewSet):
+    """Manage genres in the database"""
+
+    queryset = Genre.objects.all()
+    serializer_class = serializers.GenreSerializer
+
     def get_queryset(self):
         """Return filtered objects"""
 
@@ -38,13 +45,6 @@ class BaseViewSet(viewsets.GenericViewSet,
             queryset = queryset.filter(album__isnull=False).distinct()
 
         return queryset
-
-
-class GenreViewSet(BaseViewSet):
-    """Manage genres in the database"""
-
-    queryset = Genre.objects.all()
-    serializer_class = serializers.GenreSerializer
 
 
 class TrackViewSet(BaseViewSet):
