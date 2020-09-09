@@ -79,6 +79,9 @@ class Genre(models.Model):
         on_delete=models.PROTECT
     )
 
+    class Meta:
+        ordering = ['-id']
+
     def __str__(self):
         return self.name
 
@@ -98,6 +101,9 @@ class Track(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT
     )
+
+    class Meta:
+        ordering = ['-id']
 
     def __str__(self):
         return self.name
@@ -121,6 +127,9 @@ class AudioBook(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT
     )
+
+    class Meta:
+        ordering = ['-id']
 
     def __str__(self):
         return self.title
@@ -158,6 +167,9 @@ class Album(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT
     )
+
+    class Meta:
+        ordering = ['-id']
 
     def __str__(self):
         return self.name

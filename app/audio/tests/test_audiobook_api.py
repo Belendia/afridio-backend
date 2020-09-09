@@ -96,11 +96,11 @@ class PrivateAudioBooksApiTest(TestCase):
 
         res = self.client.get(AUDIOBOOK_URL)
 
-        audiobooks = AudioBook.objects.all().order_by('-title')
+        audiobooks = AudioBook.objects.all().order_by('-id')
         serializer = AudioBookSerializer(audiobooks, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(res.data['results'], serializer.data)
 
     def test_create_audiobook(self):
         """Test create a new audiobook"""
@@ -305,9 +305,9 @@ class AudioBookImageUploadTest(TestCase):
         serializer2 = AudioBookSerializer(audiobook2)
         serializer3 = AudioBookSerializer(audiobook3)
 
-        self.assertIn(serializer1.data, res.data)
-        self.assertIn(serializer2.data, res.data)
-        self.assertNotIn(serializer3.data, res.data)
+        self.assertIn(serializer1.data, res.data['results'])
+        self.assertIn(serializer2.data, res.data['results'])
+        self.assertNotIn(serializer3.data, res.data['results'])
 
     def test_filter_audiobook_by_tracks(self):
         """Test returning audiobooks with specific tracks"""
@@ -332,6 +332,6 @@ class AudioBookImageUploadTest(TestCase):
         serializer2 = AudioBookSerializer(audiobook2)
         serializer3 = AudioBookSerializer(audiobook3)
 
-        self.assertIn(serializer1.data, res.data)
-        self.assertIn(serializer2.data, res.data)
-        self.assertNotIn(serializer3.data, res.data)
+        self.assertIn(serializer1.data, res.data['results'])
+        self.assertIn(serializer2.data, res.data['results'])
+        self.assertNotIn(serializer3.data, res.data['results'])

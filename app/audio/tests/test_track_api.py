@@ -50,11 +50,11 @@ class PrivateTracksApiTest(TestCase):
 
         res = self.client.get(TRACKS_URL)
 
-        tracks = Track.objects.all().order_by('-name')
+        tracks = Track.objects.all().order_by('-id')
         serializer = TrackSerializer(tracks, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(res.data['results'], serializer.data)
 
     def test_create_track_successful(self):
         """Test create a new track"""

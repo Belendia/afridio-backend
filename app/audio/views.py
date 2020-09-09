@@ -3,6 +3,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 
 from core.models import Genre, Track, AudioBook, Album
 from audio import serializers
@@ -15,6 +16,7 @@ class BaseViewSet(viewsets.GenericViewSet,
 
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+    pagination_class = PageNumberPagination
     lookup_field = 'slug'
 
     def perform_create(self, serializer):
@@ -136,6 +138,7 @@ class AlbumViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.AlbumSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+    pagination_class = PageNumberPagination
     lookup_field = 'slug'
 
     def perform_create(self, serializer):

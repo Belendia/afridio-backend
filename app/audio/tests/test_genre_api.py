@@ -44,11 +44,11 @@ class PrivateGenreApiTest(TestCase):
 
         res = self.client.get(GENRE_URL)
 
-        genres = Genre.objects.all().order_by('-name')
+        genres = Genre.objects.all().order_by('-id')
         serializer = GenreSerializer(genres, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(res.data['results'], serializer.data)
 
     def test_create_genre_successful(self):
         """Test creating a new genre"""
@@ -90,8 +90,8 @@ class PrivateGenreApiTest(TestCase):
         serializer1 = GenreSerializer(genre1)
         serializer2 = GenreSerializer(genre2)
 
-        self.assertIn(serializer1.data, res.data)
-        self.assertNotIn(serializer2.data, res.data)
+        self.assertIn(serializer1.data, res.data['results'])
+        self.assertNotIn(serializer2.data, res.data['results'])
 
     def test_retrieve_genres_assigned_to_audiobooks_unique(self):
         """Test filtering genres by assigned returns unique audiobooks"""
@@ -119,7 +119,7 @@ class PrivateGenreApiTest(TestCase):
 
         res = self.client.get(GENRE_URL, {'audiobook_assigned_only': 1})
 
-        self.assertEqual(len(res.data), 1)
+        self.assertEqual(len(res.data['results']), 1)
 
     def test_retrieve_genres_assigned_to_albums(self):
         """Test filtering genres by those assigned to albums"""
@@ -143,8 +143,8 @@ class PrivateGenreApiTest(TestCase):
         serializer1 = GenreSerializer(genre1)
         serializer2 = GenreSerializer(genre2)
 
-        self.assertIn(serializer1.data, res.data)
-        self.assertNotIn(serializer2.data, res.data)
+        self.assertIn(serializer1.data, res.data['results'])
+        self.assertNotIn(serializer2.data, res.data['results'])
 
     def test_retrieve_genres_assigned_to_albums_unique(self):
         """Test filtering genres by assigned returns unique albums"""
@@ -176,4 +176,4 @@ class PrivateGenreApiTest(TestCase):
 
         res = self.client.get(GENRE_URL, {'album_assigned_only': 1})
 
-        self.assertEqual(len(res.data), 1)
+        self.assertEqual(len(res.data['results']), 1)

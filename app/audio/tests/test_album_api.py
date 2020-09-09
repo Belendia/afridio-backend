@@ -98,11 +98,11 @@ class PrivateAlbumsApiTest(TestCase):
 
         res = self.client.get(ALBUMS_URL)
 
-        albums = Album.objects.all().order_by('-name')
+        albums = Album.objects.all().order_by('-id')
         serializer = AlbumSerializer(albums, many=True)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(res.data, serializer.data)
+        self.assertEqual(res.data['results'], serializer.data)
 
     def test_create_album_with_genres(self):
         """Test creating album with genre"""
@@ -245,9 +245,9 @@ class AlbumImageUploadTest(TestCase):
         serializer2 = AlbumSerializer(album2)
         serializer3 = AlbumSerializer(album3)
 
-        self.assertIn(serializer1.data, res.data)
-        self.assertIn(serializer2.data, res.data)
-        self.assertNotIn(serializer3.data, res.data)
+        self.assertIn(serializer1.data, res.data['results'])
+        self.assertIn(serializer2.data, res.data['results'])
+        self.assertNotIn(serializer3.data, res.data['results'])
 
     def test_filter_album_by_tracks(self):
         """Test returning albums with specific tracks"""
@@ -272,6 +272,6 @@ class AlbumImageUploadTest(TestCase):
         serializer2 = AlbumSerializer(album2)
         serializer3 = AlbumSerializer(album3)
 
-        self.assertIn(serializer1.data, res.data)
-        self.assertIn(serializer2.data, res.data)
-        self.assertNotIn(serializer3.data, res.data)
+        self.assertIn(serializer1.data, res.data['results'])
+        self.assertIn(serializer2.data, res.data['results'])
+        self.assertNotIn(serializer3.data, res.data['results'])
