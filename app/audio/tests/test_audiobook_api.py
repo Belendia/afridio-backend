@@ -335,3 +335,20 @@ class AudioBookImageUploadTest(TestCase):
         self.assertIn(serializer1.data, res.data['results'])
         self.assertIn(serializer2.data, res.data['results'])
         self.assertNotIn(serializer3.data, res.data['results'])
+
+    def test_search_audiobook_by_title(self):
+        """Test returning audiobooks with specific title"""
+
+        audiobook1 = sample_audiobook(user=self.user, title='The Fox')
+        audiobook2 = sample_audiobook(user=self.user, title='Strong lions')
+
+        res = self.client.get(
+            AUDIOBOOK_URL,
+            {'search': 'Fox'}
+        )
+
+        serializer1 = AudioBookSerializer(audiobook1)
+        serializer2 = AudioBookSerializer(audiobook2)
+
+        self.assertIn(serializer1.data, res.data['results'])
+        self.assertNotIn(serializer2.data, res.data['results'])

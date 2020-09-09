@@ -275,3 +275,20 @@ class AlbumImageUploadTest(TestCase):
         self.assertIn(serializer1.data, res.data['results'])
         self.assertIn(serializer2.data, res.data['results'])
         self.assertNotIn(serializer3.data, res.data['results'])
+
+    def test_search_album_by_name(self):
+        """Test returning albums with specific name"""
+
+        album1 = sample_album(user=self.user, name='Smile')
+        album2 = sample_album(user=self.user, name='The bright side')
+
+        res = self.client.get(
+            ALBUMS_URL,
+            {'search': 'Smile'}
+        )
+
+        serializer1 = AlbumSerializer(album1)
+        serializer2 = AlbumSerializer(album2)
+
+        self.assertIn(serializer1.data, res.data['results'])
+        self.assertNotIn(serializer2.data, res.data['results'])
