@@ -1,6 +1,6 @@
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
@@ -16,7 +16,7 @@ class BaseViewSet(viewsets.GenericViewSet,
     """Base viewset for audio app"""
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (DjangoModelPermissionsOrAnonReadOnly, )
     pagination_class = PageNumberPagination
     lookup_field = 'slug'
 
@@ -69,7 +69,7 @@ class AudioBookViewSet(viewsets.ModelViewSet):
     queryset = AudioBook.objects.all()
     serializer_class = serializers.AudioBookSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
     filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ['title']
     lookup_field = 'slug'
@@ -140,7 +140,7 @@ class AlbumViewSet(viewsets.ModelViewSet):
     queryset = Album.objects.all()
     serializer_class = serializers.AlbumSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
     pagination_class = PageNumberPagination
     filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ['name']

@@ -69,12 +69,12 @@ class PublicAudioBookApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
 
-    def test_login_required(self):
-        """Test that login is required to access the endpoint"""
+    def test_login_not_required(self):
+        """Test that login is not required to access the endpoint"""
 
         res = self.client.get(AUDIOBOOK_URL)
 
-        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
 
 class PrivateAudioBooksApiTest(TestCase):
@@ -82,7 +82,7 @@ class PrivateAudioBooksApiTest(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_user(
+        self.user = get_user_model().objects.create_superuser(
             'test@habeltech.com',
             'testpass'
         )
@@ -246,7 +246,7 @@ class AudioBookImageUploadTest(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_user(
+        self.user = get_user_model().objects.create_superuser(
             'test@habeltech.com',
             'testpass'
         )

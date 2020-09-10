@@ -18,18 +18,18 @@ class PublicGenreApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
 
-    def test_login_required(self):
-        """Test that login is required for retrieving genre"""
+    def test_login_not_required(self):
+        """Test that login is not required for retrieving genre"""
 
         res = self.client.get(GENRE_URL)
-        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
 
 class PrivateGenreApiTest(TestCase):
     """Test the authorized user genre API"""
 
     def setUp(self):
-        self.user = get_user_model().objects.create_user(
+        self.user = get_user_model().objects.create_superuser(
             'test@habeltech.com',
             'password123'
         )

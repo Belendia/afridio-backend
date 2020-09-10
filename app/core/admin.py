@@ -15,14 +15,19 @@ class UserAdmin(BaseUserAdmin):
             _('Permissions'),
             {'fields': ('is_active', 'is_staff', 'is_superuser')}
         ),
+        ('Groups', {'fields': ('groups',)}),
+        ('Permissions', {'fields': ('user_permissions',)}),
         (_('Important dates'), {'fields': ('last_login', )}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide', ),
-            'fields': ('email', 'password1', 'password2')
+            'fields': ('email', 'password1', 'password2'),
         }),
+        ('Groups', {'fields': ('groups',)}),
+        ('Permissions', {'fields': ('user_permissions',)}),
     )
+    filter_horizontal = ('groups', 'user_permissions',)
 
 
 admin.site.register(models.User, UserAdmin)
