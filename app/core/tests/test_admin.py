@@ -1,3 +1,5 @@
+from datetime import date
+
 from django .test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -15,7 +17,10 @@ class AdminSiteTest(TestCase):
         self.user = get_user_model().objects.create_user(
             email='test@habeltech.com',
             password='password123',
-            name='Test user full name'
+            name='Test user full name',
+            sex='FEMALE',
+            date_of_birth=date.today(),
+            phone='+251911000000'
         )
 
     def test_users_listed(self):

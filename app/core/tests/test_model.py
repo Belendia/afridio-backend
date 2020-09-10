@@ -9,7 +9,14 @@ from core import models
 
 def sample_user(email='test@habeltech.com', password='testpass'):
     """Create a sample user"""
-    return get_user_model().objects.create_user(email, password)
+    return get_user_model().objects.create_user(
+        email,
+        password,
+        name='Test user full name',
+        sex='FEMALE',
+        date_of_birth=datetime.now(),
+        phone='+251911000000'
+    )
 
 
 class ModelTests(TestCase):
@@ -22,7 +29,11 @@ class ModelTests(TestCase):
 
         user = get_user_model().objects.create_user(
             email=email,
-            password=password
+            password=password,
+            name='Test user full name',
+            sex='FEMALE',
+            date_of_birth=datetime.now(),
+            phone='+251911000000'
         )
 
         self.assertEqual(user.email, email)
@@ -32,7 +43,14 @@ class ModelTests(TestCase):
         """Test the email for the new user is normalized"""
 
         email = 'test@HABELTECH.com'
-        user = get_user_model().objects.create_user(email, 'test123')
+        user = get_user_model().objects.create_user(
+            email,
+            'test123',
+            name='Test user full name',
+            sex='FEMALE',
+            date_of_birth=datetime.now(),
+            phone='+251911000000'
+        )
 
         self.assertEqual(user.email, email.lower())
 
@@ -40,7 +58,14 @@ class ModelTests(TestCase):
         """Test creating user with no email raises error"""
 
         with self.assertRaises(ValueError):
-            get_user_model().objects.create_user(None, 'test123')
+            get_user_model().objects.create_user(
+                None,
+                'test123',
+                name='Test user full name',
+                sex='FEMALE',
+                date_of_birth=datetime.now(),
+                phone='+251911000000'
+            )
 
     def test_create_new_superuser(self):
         """Test creating a new superuser"""

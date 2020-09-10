@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -28,7 +30,10 @@ class PublicUserApiTests(TestCase):
             'email': 'test@habeltech.com',
             'password': 'Test1234',
             'confirm_password': 'Test1234',
-            'name': 'User Name'
+            'name': 'User Name',
+            'sex': 'FEMALE',
+            'date_of_birth': date.today(),
+            'phone': '+251911000000'
         }
 
         response = self.client.post(CREATE_USER_URL, payload)
@@ -44,7 +49,10 @@ class PublicUserApiTests(TestCase):
         payload = {
             'email': 'test@habeltech.com',
             'password': 'test1234',
-            'name': 'Test'
+            'name': 'Test',
+            'sex': 'FEMALE',
+            'date_of_birth': date.today(),
+            'phone': '+251911000000'
         }
         create_user(**payload)
 
@@ -58,7 +66,10 @@ class PublicUserApiTests(TestCase):
         payload = {
             'email': 'test@habeltech.com',
             'password': 'pw',
-            'name': 'Test'
+            'name': 'Test',
+            'sex': 'FEMALE',
+            'date_of_birth': date.today(),
+            'phone': '+251911000000'
         }
         response = self.client.post(CREATE_USER_URL, payload)
 
@@ -72,7 +83,14 @@ class PublicUserApiTests(TestCase):
     def test_create_token_for_user(self):
         """Test that a token is created for the user"""
 
-        payload = {'email': 'test@habeltech.com', 'password': 'testpass'}
+        payload = {
+            'email': 'test@habeltech.com',
+            'password': 'test1234',
+            'name': 'Test',
+            'sex': 'FEMALE',
+            'date_of_birth': date.today(),
+            'phone': '+251911000000'
+        }
         create_user(**payload)
 
         response = self.client.post(TOKEN_URL, payload)
@@ -83,7 +101,14 @@ class PublicUserApiTests(TestCase):
     def test_create_token_invalid_credentials(self):
         """Test that token is not created if invalid credentials are given"""
 
-        create_user(email='test@habeltech.com', password='testpass')
+        create_user(
+            email='test@habeltech.com',
+            password='testpass',
+            name='Test user full name',
+            sex='FEMALE',
+            date_of_birth=date.today(),
+            phone='+251911000000'
+        )
         payload = {'email': 'test@habeltech.com', 'password': 'wrongpass'}
 
         response = self.client.post(TOKEN_URL, payload)
@@ -123,7 +148,10 @@ class PrivateUserApiTests(TestCase):
         self.user = create_user(
             email='test@haveltech.com',
             password='testpass',
-            name='Name'
+            name='Name',
+            sex='FEMALE',
+            date_of_birth='2000-01-01',
+            phone='+251911000000'
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
@@ -134,8 +162,11 @@ class PrivateUserApiTests(TestCase):
         response = self.client.get(ME_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {
+            'email': self.user.email,
             'name': self.user.name,
-            'email': self.user.email
+            "sex": self.user.sex,
+            "phone": self.user.phone,
+            "date_of_birth": self.user.date_of_birth
         })
 
     def test_post_me_not_allowed(self):

@@ -1,6 +1,7 @@
 import os
 import uuid
 from enum import Enum
+from datetime import date
 from secrets import token_urlsafe
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
@@ -46,7 +47,13 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password):
         """Creates and saves a new superuser"""
 
-        user = self.create_user(email, password)
+        user = self.create_user(email, password,
+                                name='admin',
+                                sex=User.Sex.UNSURE,
+                                date_of_birth=date.today(),
+                                phone='+251911000000'
+                                )
+
         user.is_staff = True
         user.is_superuser = True
 
@@ -58,12 +65,27 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     """Custom user model that supports using email instead of username"""
 
+    class Sex(Enum):
+        MALE = "MALE"
+        FEMALE = "FEMALE"
+        UNSURE = "UNSURE"
+
+        @classmethod
+        def choices(cls):
+            return [(key.value, key.name) for key in cls]
+
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=50)
+    date_of_birth = models.DateField()
+    sex = models.CharField(max_length=20, choices=Sex.choices())
+    picture = models.ImageField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    last_login = models.DateTimeField(null=True)
     groups = models.ManyToManyField(
         Group,
+        blank=True,
         verbose_name=_('groups'),
         help_text=_(
             'The groups this user belongs to. A user will get all permissions '
