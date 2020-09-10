@@ -39,7 +39,7 @@ class PublicUserApiTests(TestCase):
         response = self.client.post(CREATE_USER_URL, payload)
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        user = get_user_model().objects.get(**response.data)
+        user = get_user_model().objects.get(email=response.data['email'])
         self.assertTrue(user.check_password(payload['password']))
         self.assertNotIn('password', response.data)
         self.assertNotIn('confirm_password', response.data)
@@ -161,13 +161,12 @@ class PrivateUserApiTests(TestCase):
 
         response = self.client.get(ME_URL)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {
-            'email': self.user.email,
-            'name': self.user.name,
-            "sex": self.user.sex,
-            "phone": self.user.phone,
-            "date_of_birth": self.user.date_of_birth
-        })
+        self.assertEqual(response.data['email'], self.user.email)
+        self.assertEqual(response.data['name'], self.user.name)
+        self.assertEqual(response.data['sex'], self.user.sex)
+        self.assertEqual(response.data['phone'], self.user.phone)
+        self.assertEqual(response.data['date_of_birth'],
+                         self.user.date_of_birth)
 
     def test_post_me_not_allowed(self):
         """Test that POST is not allowed on the me URL"""
