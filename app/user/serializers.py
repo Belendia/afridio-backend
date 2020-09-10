@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model, authenticate
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.models import Group
 
 from rest_framework import serializers
 
@@ -34,7 +35,16 @@ class UserSerializer(serializers.ModelSerializer):
             msg = _('Passwords must match')
             raise serializers.ValidationError({'password': msg})
 
-        return get_user_model().objects.create_user(**validated_data)
+        user = get_user_model().objects.create_user(**validated_data)
+        # set default group
+        try:
+            group = Group.objects.get(name='User')
+            user.groups.add(group)
+            user.save()
+        except Group.DoesNotExist:
+            pass
+
+        return user
 
     def update(self, instance, validated_data):
         """Update a user, setting the password correctly and return it"""
