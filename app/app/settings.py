@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'core',
     'user',
     'audio',
-    'ecommerce'
+    'ecommerce',
 ]
 
 MIDDLEWARE = [

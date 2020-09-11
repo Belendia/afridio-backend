@@ -7,5 +7,5 @@ app_name = 'ecommerce'
 
 urlpatterns = [
     path('', media_list, name='media-list'),
-    path('', order_summary, name='order-summary'),
+    path('order_summary', order_summary, name='order-summary'),
 ]
