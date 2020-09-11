@@ -101,54 +101,27 @@ class ModelTests(TestCase):
 
         self.assertEqual(str(track), track.name)
 
-    def test_audiobook_str(self):
-        """Test the audiobook string representation"""
+    def test_media_str(self):
+        """Test the media string representation"""
 
-        audiobook = models.AudioBook.objects.create(
-            title="The sample audio book",
+        media = models.Media.objects.create(
+            title="The sample media book",
             word_count=12500,
             estimated_length_in_seconds=25200,
             price=12.50,
             user=sample_user()
         )
 
-        self.assertEqual(str(audiobook), audiobook.title)
-
-    def test_album_str(self):
-        """Test the album string representation"""
-
-        album = models.Album.objects.create(
-            name="Sample album",
-            album_type=models.Album.AlbumType.ALBUM,
-            estimated_length_in_seconds=25200,
-            popularity=35,
-            price=12.50,
-            release_date=datetime.now(),
-            user=sample_user()
-        )
-
-        self.assertEqual(str(album), album.name)
+        self.assertEqual(str(media), media.title)
 
     @patch('uuid.uuid4')
-    def test_audiobook_file_name_uuid(self, mock_uuid):
+    def test_media_file_name_uuid(self, mock_uuid):
         """Test that image is saved in the correct location"""
 
         uuid = 'test-uuid'
         mock_uuid.return_value = uuid
 
-        file_path = models.audiobook_image_file_path(None, 'myimage.jpg')
+        file_path = models.media_image_file_path(None, 'myimage.jpg')
 
-        expected_path = f'uploads/audiobook/{uuid}.jpg'
-        self.assertEqual(file_path, expected_path)
-
-    @patch('uuid.uuid4')
-    def test_album_file_name_uuid(self, mock_uuid):
-        """Test that image is saved in the correct location"""
-
-        uuid = 'test-uuid'
-        mock_uuid.return_value = uuid
-
-        file_path = models.album_image_file_path(None, 'myimage.jpg')
-
-        expected_path = f'uploads/album/{uuid}.jpg'
+        expected_path = f'uploads/media/{uuid}.jpg'
         self.assertEqual(file_path, expected_path)

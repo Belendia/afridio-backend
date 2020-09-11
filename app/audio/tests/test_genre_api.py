@@ -5,7 +5,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Genre, AudioBook, Album
+from core.models import Genre, Media
 from audio.serializers import GenreSerializer
 
 
@@ -70,22 +70,22 @@ class PrivateGenreApiTest(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_retrieve_genres_assigned_to_audiobooks(self):
-        """Test filtering genres by those assigned to audiobooks"""
+    def test_retrieve_genres_assigned_to_medias(self):
+        """Test filtering genres by those assigned to medias"""
 
         genre1 = Genre.objects.create(user=self.user, name='Fiction')
         genre2 = Genre.objects.create(user=self.user, name='Novel')
 
-        audiobook = AudioBook.objects.create(
+        media = Media.objects.create(
             title='Sample audio book',
             word_count=14543,
             estimated_length_in_seconds=25000,
             price=12.50,
             user=self.user
         )
-        audiobook.genres.add(genre1)
+        media.genres.add(genre1)
 
-        res = self.client.get(GENRE_URL, {'audiobook_assigned_only': 1})
+        res = self.client.get(GENRE_URL, {'assigned_only': 1})
 
         serializer1 = GenreSerializer(genre1)
         serializer2 = GenreSerializer(genre2)
@@ -93,87 +93,30 @@ class PrivateGenreApiTest(TestCase):
         self.assertIn(serializer1.data, res.data['results'])
         self.assertNotIn(serializer2.data, res.data['results'])
 
-    def test_retrieve_genres_assigned_to_audiobooks_unique(self):
-        """Test filtering genres by assigned returns unique audiobooks"""
+    def test_retrieve_genres_assigned_to_medias_unique(self):
+        """Test filtering genres by assigned returns unique medias"""
 
         genre = Genre.objects.create(user=self.user, name='Fiction')
         Genre.objects.create(user=self.user, name='Novel')
 
-        audiobook1 = AudioBook.objects.create(
+        media1 = Media.objects.create(
             title='Sample audio book',
             word_count=14543,
             estimated_length_in_seconds=25000,
             price=12.50,
             user=self.user
         )
-        audiobook1.genres.add(genre)
+        media1.genres.add(genre)
 
-        audiobook2 = AudioBook.objects.create(
+        media2 = Media.objects.create(
             title='Audio book 2',
             word_count=25543,
             estimated_length_in_seconds=15000,
             price=10.50,
             user=self.user
         )
-        audiobook2.genres.add(genre)
+        media2.genres.add(genre)
 
-        res = self.client.get(GENRE_URL, {'audiobook_assigned_only': 1})
-
-        self.assertEqual(len(res.data['results']), 1)
-
-    def test_retrieve_genres_assigned_to_albums(self):
-        """Test filtering genres by those assigned to albums"""
-
-        genre1 = Genre.objects.create(user=self.user, name='Jazz')
-        genre2 = Genre.objects.create(user=self.user, name='Rock')
-
-        album = Album.objects.create(
-            name='Sample album',
-            album_type='ALBUM',
-            estimated_length_in_seconds=25525,
-            popularity=35,
-            price=12.50,
-            release_date='2020-09-04',
-            user=self.user
-        )
-        album.genres.add(genre1)
-
-        res = self.client.get(GENRE_URL, {'album_assigned_only': 1})
-
-        serializer1 = GenreSerializer(genre1)
-        serializer2 = GenreSerializer(genre2)
-
-        self.assertIn(serializer1.data, res.data['results'])
-        self.assertNotIn(serializer2.data, res.data['results'])
-
-    def test_retrieve_genres_assigned_to_albums_unique(self):
-        """Test filtering genres by assigned returns unique albums"""
-
-        genre = Genre.objects.create(user=self.user, name='Fiction')
-        Genre.objects.create(user=self.user, name='Novel')
-
-        album1 = Album.objects.create(
-            name='Sample album',
-            album_type='ALBUM',
-            estimated_length_in_seconds=25525,
-            popularity=35,
-            price=12.50,
-            release_date='2020-09-04',
-            user=self.user
-        )
-        album1.genres.add(genre)
-
-        album2 = Album.objects.create(
-            name='Sample album',
-            album_type='ALBUM',
-            estimated_length_in_seconds=25525,
-            popularity=35,
-            price=12.50,
-            release_date='2020-09-04',
-            user=self.user
-        )
-        album2.genres.add(genre)
-
-        res = self.client.get(GENRE_URL, {'album_assigned_only': 1})
+        res = self.client.get(GENRE_URL, {'assigned_only': 1})
 
         self.assertEqual(len(res.data['results']), 1)

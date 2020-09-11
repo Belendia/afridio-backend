@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Genre, Track, AudioBook, Album
+from core.models import Genre, Track, Media
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -24,8 +24,8 @@ class TrackSerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
 
 
-class AudioBookSerializer(serializers.ModelSerializer):
-    """Serializer for audiobook objects"""
+class MediaSerializer(serializers.ModelSerializer):
+    """Serializer for media objects"""
 
     genres = serializers.SlugRelatedField(
         many=True,
@@ -39,65 +39,27 @@ class AudioBookSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        model = AudioBook
-        fields = ('slug', 'title', 'word_count', 'estimated_length_in_seconds',
-                  'price', 'image', 'created', 'updated', 'genres', 'tracks')
+        model = Media
+        fields = ('title', 'price', 'image', 'slug',
+                  'estimated_length_in_seconds', 'popularity', 'release_date',
+                  'media_type', 'word_count', 'album_type', 'genres', 'tracks',
+                  'created', 'updated')
         read_only_fields = ('id', 'slug', 'created', 'updated')
         lookup_field = 'slug'
 
 
-class AudioBookDetailSerializer(AudioBookSerializer):
-    """Serializer an audiobook detail"""
+class MediaDetailSerializer(MediaSerializer):
+    """Serializer an media detail"""
 
     genres = GenreSerializer(many=True, read_only=True)
     tracks = TrackSerializer(many=True, read_only=True)
 
 
-class AlbumSerializer(serializers.ModelSerializer):
-    """Serializer for album objects"""
-
-    genres = serializers.SlugRelatedField(
-        many=True,
-        slug_field='slug',
-        queryset=Genre.objects.all()
-    )
-    tracks = serializers.SlugRelatedField(
-        many=True,
-        slug_field='slug',
-        queryset=Track.objects.all()
-    )
+class MediaImageSerializer(serializers.ModelSerializer):
+    """Serializer for uploading images to media"""
 
     class Meta:
-        model = Album
-        fields = ('slug', 'name', 'album_type', 'estimated_length_in_seconds',
-                  'popularity', 'price', 'release_date', 'image', 'created',
-                  'updated', 'genres', 'tracks')
-        read_only_fields = ('id', 'slug', 'created', 'updated')
-        lookup_field = 'slug'
-
-
-class AlbumDetailSerializer(AlbumSerializer):
-    """Serializer an album detail"""
-
-    genres = GenreSerializer(many=True, read_only=True)
-    tracks = TrackSerializer(many=True, read_only=True)
-
-
-class AudioBookImageSerializer(serializers.ModelSerializer):
-    """Serializer for uploading images to audio books"""
-
-    class Meta:
-        model = AudioBook
-        fields = ('slug', 'image')
-        read_only_fields = ('slug', )
-        lookup_field = 'slug'
-
-
-class AlbumImageSerializer(serializers.ModelSerializer):
-    """Serializer for uploading images to albums"""
-
-    class Meta:
-        model = Album
+        model = Media
         fields = ('slug', 'image')
         read_only_fields = ('slug', )
         lookup_field = 'slug'

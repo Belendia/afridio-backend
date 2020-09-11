@@ -14,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='album',
             name='image',
-            field=models.ImageField(null=True, upload_to=core.models.album_image_file_path),
+            field=models.ImageField(null=True, upload_to=core.models.media_image_file_path),
         ),
         migrations.AddField(
             model_name='audiobook',
             name='image',
-            field=models.ImageField(null=True, upload_to=core.models.audiobook_image_file_path),
+            field=models.ImageField(null=True, upload_to=core.models.media_image_file_path),
         ),
     ]
