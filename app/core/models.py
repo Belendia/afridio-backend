@@ -145,7 +145,7 @@ class Media(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    class MediaType(Enum):
+    class MediaFormat(Enum):
         ALBUM = "ALBUM"
         AUDIOBOOK = "AUDIOBOOK"
         PODCAST = "PODCAST"
@@ -156,10 +156,9 @@ class Media(models.Model):
         def choices(cls):
             return [(key.value, key.name) for key in cls]
 
-    media_type = models.CharField(
+    media_format = models.CharField(
         max_length=20,
-        choices=MediaType.choices(),
-        null=True
+        choices=MediaFormat.choices()
     )
 
     # Audiobook

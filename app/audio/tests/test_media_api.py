@@ -109,7 +109,8 @@ class PrivateMediaApiTest(TestCase):
             'title': 'Sample audio book',
             'word_count': 14543,
             'estimated_length_in_seconds': 25000,
-            'price': 12.50
+            'price': 12.50,
+            'media_format': 'AUDIOBOOK'
         }
 
         res = self.client.post(MEDIA_URL, payload)
@@ -132,6 +133,7 @@ class PrivateMediaApiTest(TestCase):
             'word_count': 16512,
             'estimated_length_in_seconds': 30000,
             'price': 20.50,
+            'media_format': 'AUDIOBOOK',
             'genres': [genre1.slug, genre2.slug]
         }
 
@@ -157,6 +159,7 @@ class PrivateMediaApiTest(TestCase):
             'word_count': 16512,
             'estimated_length_in_seconds': 30000,
             'price': 20.50,
+            'media_format': 'AUDIOBOOK',
             'tracks': [track1.slug, track2.slug]
         }
 
@@ -229,6 +232,7 @@ class PrivateMediaApiTest(TestCase):
             'word_count': 16512,
             'estimated_length_in_seconds': 3029,
             'price': 20.50,
+            'media_format': 'AUDIOBOOK',
         }
 
         url = media_detail_url(media.slug)

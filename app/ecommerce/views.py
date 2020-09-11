@@ -6,7 +6,7 @@ def media_list(request):
     context = {
         'medias': Media.objects.all()
     }
-    return render(request, 'media.html', context)
+    return render(request, 'home.html', context)
 
 
 def order_summary(request):
