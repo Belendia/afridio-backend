@@ -24,4 +24,5 @@ urlpatterns = [
     re_path(r'api/(?P<version>[v1]+)/',
             include('user.urls')),
     path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
