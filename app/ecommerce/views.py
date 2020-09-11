@@ -1,3 +1,13 @@
-# from django.shortcuts import render
+from django.shortcuts import render
+from core.models import Media
 
-# Create your views here.
+
+def media_list(request):
+    context = {
+        'medias': Media.objects.all()
+    }
+    return render(request, 'media.html', context)
+
+
+def order_summary(request):
+    return render(request, 'order_summary.html')
