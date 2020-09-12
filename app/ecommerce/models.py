@@ -6,6 +6,14 @@ from core.models import Media
 
 class OrderMedia(models.Model):
     media = models.ForeignKey(Media, on_delete=models.CASCADE)
+    ordered = models.BooleanField(default=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f"{ self.media.title }"
 
 
 class Order(models.Model):
@@ -16,5 +24,9 @@ class Order(models.Model):
     ordered = models.BooleanField(default=False)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT
+        on_delete=models.CASCADE
     )
+
+    def __str__(self):
+        return f"{ self.user.email }"
+

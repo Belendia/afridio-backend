@@ -10,6 +10,7 @@ from django.conf import settings
 from django.db.models.signals import pre_save
 from django.utils.translation import ugettext_lazy as _
 from django.utils.text import slugify
+from django.shortcuts import reverse
 
 
 def media_image_file_path(instance, filename):
@@ -137,11 +138,15 @@ class Media(models.Model):
     # Common fields
     title = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=5, decimal_places=2)
+    discount_price = models.DecimalField(null=True, blank=True, max_digits=5,
+                                         decimal_places=2)
     image = models.ImageField(null=True, upload_to=media_image_file_path)
     slug = models.SlugField(blank=True, unique=True)
-    estimated_length_in_seconds = models.PositiveIntegerField(null=True)
-    popularity = models.PositiveIntegerField(null=True)
+    estimated_length_in_seconds = models.PositiveIntegerField(null=True,
+                                                              blank=True,)
+    popularity = models.PositiveIntegerField(null=True, blank=True)
     release_date = models.DateField(null=True)
+    description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -151,6 +156,10 @@ class Media(models.Model):
         PODCAST = "PODCAST"
         NEWSPAPER = "NEWSPAPER"
         MAGAZINE = "MAGAZINE"
+        RADIO = "RADIO"
+        SPEECH = "SPEECH"
+        INTERVIEW = "INTERVIEW"
+        LECTURE = "LECTURE"
 
         @classmethod
         def choices(cls):
@@ -177,7 +186,8 @@ class Media(models.Model):
     album_type = models.CharField(
         max_length=20,
         choices=AlbumType.choices(),
-        null=True
+        null=True,
+        blank=True
     )
 
     # Relationships
@@ -193,6 +203,21 @@ class Media(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('ecommerce:media', kwargs={
+            'slug': self.slug
+        })
+
+    def get_add_to_cart_url(self):
+        return reverse('ecommerce:add-to-cart', kwargs={
+            'slug': self.slug
+        })
+
+    def get_remove_from_cart_url(self):
+        return reverse('ecommerce:remove-from-cart', kwargs={
+            'slug': self.slug
+        })
 
 
 def pre_save_receiver(sender, instance, *args, **kwargs):
