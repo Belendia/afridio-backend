@@ -13,6 +13,7 @@ from ecommerce.models import Order, OrderMedia
 class HomeView(ListView):
 
     queryset = Media.objects.filter(media_format='AUDIOBOOK')
+    paginate_by = 10
     template_name = "home.html"
 
 
