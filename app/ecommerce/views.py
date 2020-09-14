@@ -61,9 +61,18 @@ def add_to_cart(request, slug):
             messages.info(request, "This item is in the cart.")
             return redirect("ecommerce:order-summary")
         else:
-            order.medias.add(order_media)
-            messages.info(request, "This item was added to your cart.")
-            return redirect("ecommerce:order-summary")
+            # check that this user already purchased this media previously
+            order_media_qs = OrderMedia.objects.filter(user=request.user,
+                                                       ordered=True)
+            if order_media_qs.exists():
+                messages.info(request, "You purchased this item previously.")
+                return redirect("ecommerce:order-summary")
+            else:
+                # If this item is not purchased previously or not in the
+                # current order then add it to the order's media.
+                order.medias.add(order_media)
+                messages.info(request, "This item was added to your cart.")
+                return redirect("ecommerce:order-summary")
     else:
         ordered_date = timezone.now()
         order = Order.objects.create(
