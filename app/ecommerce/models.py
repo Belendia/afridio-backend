@@ -1,3 +1,5 @@
+from decimal import *
+
 from django.db import models
 from django.conf import settings
 from django_countries.fields import CountryField
@@ -60,8 +62,8 @@ class Order(models.Model):
         total = 0
         for order_media in self.medias.all():
             total += order_media.get_final_price()
-        # if self.coupon:
-        #     total -= self.coupon.amount
+        if self.coupon:
+            total -= Decimal(self.coupon.amount)
         return total
 
 
