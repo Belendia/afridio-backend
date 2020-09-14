@@ -222,7 +222,7 @@ class Media(models.Model):
 
 def pre_save_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
-        instance.slug = slugify(token_urlsafe(16))
+        instance.slug = slugify(token_urlsafe(32))
 
 
 pre_save.connect(pre_save_receiver, sender=Genre)

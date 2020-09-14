@@ -36,7 +36,7 @@ class OrderMedia(models.Model):
 
 
 class Order(models.Model):
-
+    ref_code = models.CharField(max_length=120, blank=True, null=True)
     start_date = models.DateTimeField(auto_now_add=True)
     ordered_date = models.DateTimeField()
     medias = models.ManyToManyField(OrderMedia)
