@@ -176,6 +176,7 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_FORMS = {'signup': 'core.forms.CustomSignupForm'}
 ACCOUNT_ADAPTER = 'core.adapter.AccountAdapter'
+ACCOUNT_EMAIL_VERIFICATION = True
 
 TEMPLATES = [
     {
@@ -203,3 +204,13 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 STRIPE_PUBLIC_KEY = 'pk_test_51HHP6NAf02FTIaFcFM4TPflDUXMlPsOn3vIB8lQ2F8UswhPLFciVqn4Z3mR0xTpQt9E8lwJV9NeQGxu07JidmOrv00auw1K40F'
 STRIPE_SECRET_KEY = 'sk_test_51HHP6NAf02FTIaFc0el4fMmpHJFfh0eCwVygdxXO0mO2rt6XqE0xNjcRFj9xi6CLAB5RCE1vzu4VwoC9UWN9iLWj00MtjHsOta'
+
+# Send email
+EMAIL_TIMEOUT = 5
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = DEFAULT_FROM_EMAIL = 'pomi144@gmail.com'
+EMAIL_HOST_PASSWORD = '#Object123;'
+EMAIL_SUBJECT_PREFIX = 'Afridio'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
