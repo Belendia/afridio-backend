@@ -97,6 +97,7 @@ class Payment(models.Model):
 class Coupon(models.Model):
     code = models.CharField(max_length=15)
     amount = models.FloatField()
+    expiry_date = models.DateTimeField()
 
     def __str__(self):
         return self.code

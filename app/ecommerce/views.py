@@ -45,9 +45,26 @@ class OrderSummaryView(LoginRequiredMixin, View):
             return redirect("/")
 
 
+def is_item_already_purchased(request, media):
+    try:
+        order_media = OrderMedia.objects.get(
+            media=media,
+            user=request.user,
+            ordered=True
+        )
+        return True
+    except ObjectDoesNotExist:
+        return False
+
+
 @login_required
 def add_to_cart(request, slug):
     media = get_object_or_404(Media, slug=slug)
+
+    if is_item_already_purchased(request, media):
+        messages.info(request, "You already purchased this item.")
+        return redirect("ecommerce:order-summary")
+
     order_media, created = OrderMedia.objects.get_or_create(
         media=media,
         user=request.user,
@@ -61,18 +78,9 @@ def add_to_cart(request, slug):
             messages.info(request, "This item is in the cart.")
             return redirect("ecommerce:order-summary")
         else:
-            # check that this user already purchased this media previously
-            order_media_qs = OrderMedia.objects.filter(user=request.user,
-                                                       ordered=True)
-            if order_media_qs.exists():
-                messages.info(request, "You purchased this item previously.")
-                return redirect("ecommerce:order-summary")
-            else:
-                # If this item is not purchased previously or not in the
-                # current order then add it to the order's media.
-                order.medias.add(order_media)
-                messages.info(request, "This item was added to your cart.")
-                return redirect("ecommerce:order-summary")
+            order.medias.add(order_media)
+            messages.info(request, "This item was added to your cart.")
+            return redirect("ecommerce:order-summary")
     else:
         ordered_date = timezone.now()
         order = Order.objects.create(
@@ -355,12 +363,20 @@ class PaymentView(View):
         return redirect("/payment/stripe/")
 
 
-def get_coupon(request, code):
+def get_coupon(code):
     try:
         coupon = Coupon.objects.get(code=code)
         return coupon
     except ObjectDoesNotExist:
-        messages.info(request, "This coupon does not exist")
+        return None
+
+
+def check_coupon_used_by_current_user(request, coupon):
+    coupon_qs = Order.objects.filter(
+                user=request.user, coupon__code=coupon.code)
+
+    if coupon_qs.exists():
+        messages.warning(request, "This coupon has been used")
         return redirect("ecommerce:checkout")
 
 
@@ -372,7 +388,20 @@ class AddCouponView(View):
                 code = form.cleaned_data.get('code')
                 order = Order.objects.get(
                     user=self.request.user, ordered=False)
-                order.coupon = get_coupon(self.request, code)
+
+                coupon = get_coupon(code)
+
+                if coupon is None:
+                    messages.warning(self.request, "This coupon does not exist")
+                    return redirect("ecommerce:checkout")
+
+                if timezone.now() > coupon.expiry_date:
+                    messages.warning(self.request, "This coupon has expired")
+                    return redirect("ecommerce:checkout")
+
+                check_coupon_used_by_current_user(self.request, coupon)
+                order.coupon = coupon
+
                 order.save()
                 messages.success(self.request, "Successfully added coupon")
                 return redirect("ecommerce:checkout")
