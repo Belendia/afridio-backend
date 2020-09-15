@@ -175,7 +175,7 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_FORMS = {'signup': 'core.forms.CustomSignupForm'}
-ACCOUNT_ADAPTER = 'core.adapter.AccountAdapter'
+ACCOUNT_ADAPTER = 'user.adapter.AccountAdapter'
 ACCOUNT_EMAIL_VERIFICATION = True
 
 TEMPLATES = [

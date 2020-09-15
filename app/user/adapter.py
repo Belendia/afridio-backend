@@ -1,4 +1,5 @@
 from allauth.account.adapter import DefaultAccountAdapter
+from django.contrib.auth.models import Group
 
 
 class AccountAdapter(DefaultAccountAdapter):
@@ -15,4 +16,10 @@ class AccountAdapter(DefaultAccountAdapter):
         user.name = form.cleaned_data.get('name')
         user.sex = form.cleaned_data.get('sex')
         user.date_of_birth = form.cleaned_data.get('date_of_birth')
+
+        user.save()
+
+        # Add user role to the current user
+        group = Group.objects.get(name='User')
+        user.groups.add(group)
         user.save()
