@@ -47,7 +47,7 @@ class OrderSummaryView(LoginRequiredMixin, View):
 
 def is_item_already_purchased(request, media):
     try:
-        order_media = OrderMedia.objects.get(
+        OrderMedia.objects.get(
             media=media,
             user=request.user,
             ordered=True
@@ -170,7 +170,8 @@ class CheckoutView(View):
                         order.save()
                     else:
                         messages.info(
-                            self.request, "No default billing address available")
+                            self.request, "No default billing address "
+                                          "available")
                         return redirect('ecommerce:checkout')
                 else:
                     print("User is entering a new billing address")
@@ -205,14 +206,17 @@ class CheckoutView(View):
 
                     else:
                         messages.info(
-                            self.request, "Please fill in the required billing address fields")
+                            self.request, "Please fill in the required "
+                                          "billing address fields")
 
                 payment_option = form.cleaned_data.get('payment_option')
 
                 if payment_option == 'S':
-                    return redirect('ecommerce:payment', payment_option='stripe')
+                    return redirect('ecommerce:payment',
+                                    payment_option='stripe')
                 elif payment_option == 'P':
-                    return redirect('ecommerce:payment', payment_option='paypal')
+                    return redirect('ecommerce:payment',
+                                    payment_option='paypal')
                 else:
                     messages.warning(
                         self.request, "Invalid payment option selected")
@@ -324,7 +328,7 @@ class PaymentView(View):
                 messages.warning(self.request, f"{err.get('message')}")
                 return redirect("/")
 
-            except stripe.error.RateLimitError as e:
+            except stripe.error.RateLimitError:
                 # Too many requests made to the API too quickly
                 messages.warning(self.request, "Rate limit error")
                 return redirect("/")
@@ -335,28 +339,30 @@ class PaymentView(View):
                 messages.warning(self.request, "Invalid parameters")
                 return redirect("/")
 
-            except stripe.error.AuthenticationError as e:
+            except stripe.error.AuthenticationError:
                 # Authentication with Stripe's API failed
                 # (maybe you changed API keys recently)
                 messages.warning(self.request, "Not authenticated")
                 return redirect("/")
 
-            except stripe.error.APIConnectionError as e:
+            except stripe.error.APIConnectionError:
                 # Network communication with Stripe failed
                 messages.warning(self.request, "Network error")
                 return redirect("/")
 
-            except stripe.error.StripeError as e:
+            except stripe.error.StripeError:
                 # Display a very generic error to the user, and maybe send
                 # yourself an email
                 messages.warning(
-                    self.request, "Something went wrong. You were not charged. Please try again.")
+                    self.request, "Something went wrong. You were not "
+                                  "charged. Please try again.")
                 return redirect("/")
 
-            except Exception as e:
+            except Exception:
                 # send an email to ourselves
                 messages.warning(
-                    self.request, "A serious error occurred. We have been notifed.")
+                    self.request, "A serious error occurred. We have been "
+                                  "notifed.")
                 return redirect("/")
 
         messages.warning(self.request, "Invalid data received")
@@ -392,7 +398,8 @@ class AddCouponView(View):
                 coupon = get_coupon(code)
 
                 if coupon is None:
-                    messages.warning(self.request, "This coupon does not exist")
+                    messages.warning(self.request, "This coupon does not "
+                                                   "exist")
                     return redirect("ecommerce:checkout")
 
                 if timezone.now() > coupon.expiry_date:
