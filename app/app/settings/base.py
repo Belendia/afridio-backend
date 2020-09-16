@@ -30,16 +30,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Third party apps
+    # django rest frameworks
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
+
+    # for social login
     'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.facebook',
     'rest_auth.registration',
+
+    # for django forms
     'crispy_forms',
 
     # Local apps
