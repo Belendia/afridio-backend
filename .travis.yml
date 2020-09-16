@@ -7,4 +7,4 @@ services:
 before_script: pip install docker-compose
 
 script:
-  - docker-compose run web sh -c "python manage.py --settings=app.settings.development test && flake8"
+  - docker-compose run web sh -c "python manage.py test --settings=app.settings.development && flake8"
