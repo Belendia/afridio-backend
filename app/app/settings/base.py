@@ -11,21 +11,14 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from decouple import config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
+BASE_DIR = os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '+0@^(z46gm3i_x+2nmi#l&_@n@c&b1fg+7r86$2jus8=w+#ap+'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
+SECRET_KEY = config('SECRET_KEY')
 
 # Application definition
 
@@ -45,6 +38,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook',
     'rest_auth.registration',
     'crispy_forms',
 
@@ -70,7 +64,7 @@ ROOT_URLCONF = 'app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,25 +73,11 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-        },
+        }
     },
 ]
 
 WSGI_APPLICATION = 'app.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'HOST': os.environ.get('DB_HOST'),
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASS'),
-    }
-}
 
 
 # Password validation
@@ -189,39 +169,37 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'user.serializers.UserSerializer',
 }
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        }
-    },
-]
-
 LOGIN_REDIRECT_URL = '/'
 
 # CRISPY FORMS
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-# Stripe
-
-STRIPE_PUBLIC_KEY = 'pk_test_51HHP6NAf02FTIaFcFM4TPflDUXMlPsOn3vIB8lQ2F8UswhPLFciVqn4Z3mR0xTpQt9E8lwJV9NeQGxu07JidmOrv00auw1K40F'
-STRIPE_SECRET_KEY = 'sk_test_51HHP6NAf02FTIaFc0el4fMmpHJFfh0eCwVygdxXO0mO2rt6XqE0xNjcRFj9xi6CLAB5RCE1vzu4VwoC9UWN9iLWj00MtjHsOta'
-
 # Send email
 EMAIL_TIMEOUT = 5
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = DEFAULT_FROM_EMAIL = 'pomi144@gmail.com'
-EMAIL_HOST_PASSWORD = '#Object123;'
-EMAIL_SUBJECT_PREFIX = 'Afridio'
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+# Facebook login
+SOCIALACCOUNT_PROVIDERS = {
+    'facebook': {
+        'SCOPE': [
+            'email',
+            'public_profile',
+            'user_friends'
+        ],
+        'FIELDS': [
+            'id',
+            'email',
+            'name',
+            'gender',
+        ],
+        'AUTH_PARAMS': {
+            #'auth_type': 'reauthenticate'
+        },
+        'METHOD': 'oauth2',
+        #'LOCALE_FUNC': 'path.to.callable',
+        'VERIFIED_EMAIL': True,
+        'VERSION': 'v8.0'
+    }
+}
