@@ -1,4 +1,4 @@
-from .base import *
+from app.settings.base import * # noqa
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -12,17 +12,17 @@ ALLOWED_HOSTS = ["afridio.com"]
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'HOST': config('DB_HOST'),
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASS'),
+        'HOST': config('DB_HOST'), # noqa
+        'NAME': config('DB_NAME'), # noqa
+        'USER': config('DB_USER'), # noqa
+        'PASSWORD': config('DB_PASS'), # noqa
     }
 }
 
 # Stripe
 
-STRIPE_PUBLIC_KEY = config('STRIPE_LIVE_PUBLIC_KEY')
-STRIPE_SECRET_KEY = config('STRIPE_LIVE_SECRET_KEY')
+STRIPE_PUBLIC_KEY = config('STRIPE_LIVE_PUBLIC_KEY') # noqa
+STRIPE_SECRET_KEY = config('STRIPE_LIVE_SECRET_KEY') # noqa
 
 # Send email
 EMAIL_HOST = 'smtp.gmail.com'

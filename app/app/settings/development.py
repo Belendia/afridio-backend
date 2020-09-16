@@ -1,4 +1,4 @@
-from .base import *
+from .base import * # noqa
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -11,17 +11,17 @@ ALLOWED_HOSTS = ["*"]
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'HOST': config('DB_HOST'),
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASS'),
+        'HOST': config('DB_HOST'), # noqa
+        'NAME': config('DB_NAME'), # noqa
+        'USER': config('DB_USER'), # noqa
+        'PASSWORD': config('DB_PASS'), # noqa
     }
 }
 
 # Stripe
 
-STRIPE_PUBLIC_KEY = config('STRIPE_TEST_PUBLIC_KEY')
-STRIPE_SECRET_KEY = config('STRIPE_TEST_SECRET_KEY')
+STRIPE_PUBLIC_KEY = config('STRIPE_TEST_PUBLIC_KEY') # noqa
+STRIPE_SECRET_KEY = config('STRIPE_TEST_SECRET_KEY') # noqa
 
 # Send email
 EMAIL_HOST = 'smtp.gmail.com'

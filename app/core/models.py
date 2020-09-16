@@ -236,7 +236,8 @@ def user_signed_up_(request, user, sociallogin=None, **kwargs):
     sociallogin.account.get_profile_url()
     sociallogin.account.extra_data['screen_name']
 
-    See the socialaccount_socialaccount table for more in the 'extra_data' field.
+    See the socialaccount_socialaccount table for more in the 'extra_data'
+    field.
     """
 
     if sociallogin:
