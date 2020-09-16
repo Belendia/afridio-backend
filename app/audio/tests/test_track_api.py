@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.test import TestCase
@@ -32,7 +34,11 @@ class PrivateTracksApiTest(TestCase):
         self.client = APIClient()
         self.user = get_user_model().objects.create_superuser(
             'test@habeltech.com',
-            'testpass'
+            'testpass',
+            name='admin',
+            sex='UNSURE',
+            date_of_birth=date.today(),
+            phone='+251911000000'
         )
         self.client.force_authenticate(self.user)
 

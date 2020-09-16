@@ -1,12 +1,12 @@
-from django.urls import path
-
-from user import views
-
+from django.urls import path, re_path, include
+from allauth.account.views import confirm_email
 
 app_name = 'user'
 
 urlpatterns = [
-    path('user/create/', views.CreateUserView.as_view(), name='create'),
-    path('user/token/', views.CreateTokenView.as_view(), name='token'),
-    path('user/me/', views.ManageUserView.as_view(), name='me'),
+    path(r'user/', include('rest_auth.urls')),
+    path(r'user/registration/', include('rest_auth.registration.urls')),
+
+    re_path(r'accounts-rest/registration/account-confirm-email/(?P<key>.+)/',
+            confirm_email, name='account_confirm_email'),
 ]

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from unittest.mock import patch
 
 from django.test import TestCase
@@ -72,7 +72,11 @@ class ModelTests(TestCase):
 
         user = get_user_model().objects.create_superuser(
             'test@habeltech.com',
-            'test123'
+            'test123',
+            name='admin',
+            sex='UNSURE',
+            date_of_birth=date.today(),
+            phone='+251911000000'
         )
 
         self.assertTrue(user.is_superuser)

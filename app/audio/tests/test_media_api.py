@@ -1,5 +1,7 @@
 import os
 import tempfile
+from datetime import date
+
 from PIL import Image
 
 from django.contrib.auth import get_user_model
@@ -9,8 +11,9 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Media, Genre, Track
+from core.models import Media, Genre, Track, User
 from audio.serializers import MediaSerializer, MediaDetailSerializer
+
 
 MEDIA_URL = reverse('audio:medias-list', kwargs={"version": "v1"})
 
@@ -84,7 +87,11 @@ class PrivateMediaApiTest(TestCase):
         self.client = APIClient()
         self.user = get_user_model().objects.create_superuser(
             'test@habeltech.com',
-            'testpass'
+            'testpass',
+            name='admin',
+            sex=User.Sex.UNSURE,
+            date_of_birth=date.today(),
+            phone='+251911000000'
         )
         self.client.force_authenticate(self.user)
 
@@ -252,7 +259,11 @@ class MediaImageUploadTest(TestCase):
         self.client = APIClient()
         self.user = get_user_model().objects.create_superuser(
             'test@habeltech.com',
-            'testpass'
+            'testpass',
+            name='admin',
+            sex=User.Sex.UNSURE,
+            date_of_birth=date.today(),
+            phone='+251911000000'
         )
         self.client.force_authenticate(self.user)
         self.media = sample_media(user=self.user)
