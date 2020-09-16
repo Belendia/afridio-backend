@@ -1,7 +1,7 @@
 from django.urls import path, re_path, include
 from allauth.account.views import confirm_email
 
-from user.views import FacebookLogin
+from user.api.views import FacebookLogin
 
 app_name = 'user'
 
