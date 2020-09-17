@@ -56,7 +56,9 @@ class Order(models.Model):
     )
 
     def __str__(self):
-        return f"{ self.user.email }"
+        if self.user:
+            return f"{ self.user.email }"
+        return str(self.ordered_date)
 
     def get_total(self):
         total = 0
@@ -91,7 +93,9 @@ class Payment(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.email
+        if self.user:
+            return f"{self.user.email}"
+        return str(self.timestamp)
 
 
 class Coupon(models.Model):
