@@ -219,13 +219,8 @@ class Media(models.Model):
         })
 
 
-def pre_save_receiver(sender, instance, *args, **kwargs):
-    if not instance.slug:
-        instance.slug = slugify(token_urlsafe(32))
-
-
 @receiver(user_signed_up)
-def user_signed_up_(request, user, sociallogin=None, **kwargs):
+def user_signed_up(request, user, sociallogin=None, **kwargs):
     """
     When a social account is created successfully and this signal is received,
     django-allauth passes in the sociallogin param, giving access to metadata
@@ -263,6 +258,11 @@ def user_signed_up_(request, user, sociallogin=None, **kwargs):
             user.save()
         except Group.DoesNotExist:
             pass
+
+
+def pre_save_receiver(sender, instance, *args, **kwargs):
+    if not instance.slug:
+        instance.slug = slugify(token_urlsafe(32))
 
 
 pre_save.connect(pre_save_receiver, sender=Genre)
