@@ -15,7 +15,9 @@ from ecommerce.models import Order, OrderMedia, Address, UserProfile, \
                                 Payment, Coupon, Refund
 from ecommerce.forms import CheckoutForm, CouponForm, PaymentForm, RefundForm
 
-from common.utils.check import is_item_already_purchased
+from common.utils.check import is_item_already_purchased, \
+    is_coupon_used_by_current_user
+
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -366,15 +368,6 @@ def get_coupon(code):
         return None
 
 
-def check_coupon_used_by_current_user(request, coupon):
-    coupon_qs = Order.objects.filter(
-                user=request.user, coupon__code=coupon.code)
-
-    if coupon_qs.exists():
-        messages.warning(request, "This coupon has been used")
-        return redirect("ecommerce:checkout")
-
-
 class AddCouponView(View):
     def post(self, *args, **kwargs):
         form = CouponForm(self.request.POST or None)
@@ -395,7 +388,10 @@ class AddCouponView(View):
                     messages.warning(self.request, "This coupon has expired")
                     return redirect("ecommerce:checkout")
 
-                check_coupon_used_by_current_user(self.request, coupon)
+                if is_coupon_used_by_current_user(self.request, coupon):
+                    messages.warning(self.request, "This coupon has been used")
+                    return redirect("ecommerce:checkout")
+
                 order.coupon = coupon
 
                 order.save()

@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 
-from ecommerce.models import OrderMedia
+from ecommerce.models import OrderMedia, Order
 
 
 def is_item_already_purchased(request, media):
@@ -13,3 +13,10 @@ def is_item_already_purchased(request, media):
         return True
     except ObjectDoesNotExist:
         return False
+
+
+def is_coupon_used_by_current_user(request, coupon):
+    coupon_qs = Order.objects.filter(
+                user=request.user, coupon__code=coupon.code)
+
+    return coupon_qs.exists()
