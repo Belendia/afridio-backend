@@ -15,6 +15,7 @@ from ecommerce.models import Order, OrderMedia, Address, UserProfile, \
                                 Payment, Coupon, Refund
 from ecommerce.forms import CheckoutForm, CouponForm, PaymentForm, RefundForm
 
+from common.utils.check import is_item_already_purchased
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -43,18 +44,6 @@ class OrderSummaryView(LoginRequiredMixin, View):
         except ObjectDoesNotExist:
             messages.warning(self.request, "You do not have an active order")
             return redirect("/")
-
-
-def is_item_already_purchased(request, media):
-    try:
-        OrderMedia.objects.get(
-            media=media,
-            user=request.user,
-            ordered=True
-        )
-        return True
-    except ObjectDoesNotExist:
-        return False
 
 
 @login_required
