@@ -11,6 +11,7 @@ from core.models import Media
 
 
 class OrderMedia(models.Model):
+    slug = models.SlugField(blank=True, unique=True)
     media = models.ForeignKey(Media, on_delete=models.CASCADE)
     ordered = models.BooleanField(default=False)
     user = models.ForeignKey(
@@ -145,3 +146,4 @@ def pre_save_receiver(sender, instance, *args, **kwargs):
 
 
 pre_save.connect(pre_save_receiver, sender=Address)
+pre_save.connect(pre_save_receiver, sender=OrderMedia)

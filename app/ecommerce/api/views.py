@@ -9,7 +9,8 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
 from rest_framework import viewsets
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, \
+    DestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -66,6 +67,14 @@ class AddToCartView(APIView):
                 user=request.user, ordered_date=ordered_date)
             order.medias.add(order_media)
             return Response(status=HTTP_200_OK)
+
+
+class OrderMediaDeleteView(DestroyAPIView):
+    permission_classes = (IsAuthenticated, )
+    lookup_field = 'slug'
+
+    def get_queryset(self):
+        return OrderMedia.objects.all().filter(user=self.request.user)
 
 
 class OrderDetailView(RetrieveAPIView):

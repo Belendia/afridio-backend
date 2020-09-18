@@ -26,6 +26,7 @@ class OrderMediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderMedia
         fields = (
+            'slug',
             'media',
             'final_price'
         )

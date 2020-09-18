@@ -2,7 +2,8 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from .views import OrderListView, AddToCartView, OrderDetailView, \
-    PaymentView, AddCouponView, AddressViewSet, CountryListView
+    PaymentView, AddCouponView, AddressViewSet, CountryListView, \
+    OrderMediaDeleteView
 
 app_name = 'ecommerce-api'
 
@@ -13,6 +14,8 @@ router.register('addresses', AddressViewSet, 'address')
 urlpatterns = [
     path('shop/order/', OrderListView.as_view(), name='orders'),
     path('shop/cart/', AddToCartView.as_view(), name='add-to-cart'),
+    path('shop/cart/<slug>/', OrderMediaDeleteView.as_view(),
+         name='remove-from-cart'),
     path('shop/order/summary/', OrderDetailView.as_view(),
          name='order-summary'),
     path('shop/checkout/', PaymentView.as_view(), name='checkout'),
