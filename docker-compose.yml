@@ -16,6 +16,8 @@ services:
       - db
   db:
     image: postgres:9.6.19-alpine
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_DB=afridio
       - POSTGRES_USER=postgres
