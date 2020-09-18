@@ -1,5 +1,6 @@
 import stripe
 from secrets import token_urlsafe
+from django_countries import countries
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -7,15 +8,17 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
+from rest_framework import viewsets
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 
-from ecommerce.models import Order, OrderMedia, Payment, UserProfile, Coupon
+from ecommerce.models import Order, OrderMedia, Payment, UserProfile, Coupon, \
+    Address
 from core.models import Media
-from ecommerce.api.serializers import OrderSerializer
+from ecommerce.api.serializers import OrderSerializer, AddressSerializer
 
 from common.utils.check import is_item_already_purchased, \
     is_coupon_used_by_current_user
@@ -83,44 +86,33 @@ class PaymentView(APIView):
         userprofile = UserProfile.objects.get(user=self.request.user)
 
         token = request.data.get('stripeToken')
-        save = False  # form.cleaned_data.get('save')
-        use_default = False  # form.cleaned_data.get('use_default')
 
-        if save:
-            if userprofile.stripe_customer_id != '' and \
-                    userprofile.stripe_customer_id is not None:
-                customer = stripe.Customer.retrieve(
-                    userprofile.stripe_customer_id)
-                customer.sources.create(source=token)
+        billing_address_id = request.data.get('billing_address')
+        billing_address = Address.objects.get(id=billing_address_id)
 
-            else:
-                customer = stripe.Customer.create(
-                    email=self.request.user.email,
-                )
-                customer.sources.create(source=token)
-                userprofile.stripe_customer_id = customer['id']
-                userprofile.one_click_purchasing = True
-                userprofile.save()
+        if userprofile.stripe_customer_id != '' and \
+                userprofile.stripe_customer_id is not None:
+            customer = stripe.Customer.retrieve(
+                userprofile.stripe_customer_id)
+            customer.sources.create(source=token)
 
-            amount = int(order.get_total() * 100)
+        else:
+            customer = stripe.Customer.create(
+                email=self.request.user.email,
+            )
+            customer.sources.create(source=token)
+            userprofile.stripe_customer_id = customer['id']
+            userprofile.one_click_purchasing = True
+            userprofile.save()
+
+        amount = int(order.get_total() * 100)
 
         try:
-
-            if use_default or save:
-                # charge the customer because we cannot charge the token
-                # more than once
-                charge = stripe.Charge.create(
-                    amount=amount,  # cents
-                    currency="usd",
-                    customer=userprofile.stripe_customer_id
-                )
-            else:
-                # charge once off on the token
-                charge = stripe.Charge.create(
-                    amount=amount,  # cents
-                    currency="usd",
-                    source=token
-                )
+            charge = stripe.Charge.create(
+                amount=amount,  # cents
+                currency="usd",
+                customer=userprofile.stripe_customer_id
+            )
 
             # create the payment
             payment = Payment()
@@ -138,6 +130,7 @@ class PaymentView(APIView):
 
             order.ordered = True
             order.payment = payment
+            order.billing_address = billing_address
             order.ref_code = token_urlsafe(32)
             order.save()
 
@@ -210,3 +203,22 @@ class AddCouponView(APIView):
         order.coupon = coupon
         order.save()
         return Response(status=HTTP_200_OK)
+
+
+class AddressViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = AddressSerializer
+    lookup_field = 'slug'
+
+    def get_queryset(self):
+        return Address.objects.all().filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        """Create a new object"""
+
+        serializer.save(user=self.request.user)
+
+
+class CountryListView(APIView):
+    def get(self, request, *args, **kwargs):
+        return Response(countries, status=HTTP_200_OK)

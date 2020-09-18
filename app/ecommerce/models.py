@@ -1,9 +1,11 @@
 from decimal import Decimal
+from secrets import token_urlsafe
 
 from django.db import models
 from django.conf import settings
+from django.utils.text import slugify
 from django_countries.fields import CountryField
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 
 from core.models import Media
 
@@ -70,6 +72,7 @@ class Order(models.Model):
 
 
 class Address(models.Model):
+    slug = models.SlugField(blank=True, unique=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
     street_address = models.CharField(max_length=100)
@@ -134,3 +137,11 @@ def userprofile_receiver(sender, instance, created, *args, **kwargs):
 
 
 post_save.connect(userprofile_receiver, sender=settings.AUTH_USER_MODEL)
+
+
+def pre_save_receiver(sender, instance, *args, **kwargs):
+    if not instance.slug:
+        instance.slug = slugify(token_urlsafe(32))
+
+
+pre_save.connect(pre_save_receiver, sender=Address)

@@ -40,7 +40,7 @@ class MediaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Media
-        fields = ('title', 'price','discount_price', 'image', 'slug',
+        fields = ('title', 'price', 'discount_price', 'image', 'slug',
                   'estimated_length_in_seconds', 'popularity', 'release_date',
                   'media_format', 'word_count', 'album_type', 'genres',
                   'tracks', 'created', 'updated')
