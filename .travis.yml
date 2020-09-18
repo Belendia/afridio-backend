@@ -7,4 +7,4 @@ services:
 before_script: pip install docker-compose
 
 script:
-  - docker-compose run --rm web sh -c "python manage.py wait_for_db --settings=app.settings.development && python manage.py test --settings=app.settings.development && flake8"
+  - docker-compose run --rm web sh -c "while !</dev/tcp/db/5432; do sleep 1; done; && python manage.py test --settings=app.settings.development && flake8"
