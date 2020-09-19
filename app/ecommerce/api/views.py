@@ -19,7 +19,8 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from ecommerce.models import Order, OrderMedia, Payment, UserProfile, Coupon, \
     Address
 from core.models import Media
-from ecommerce.api.serializers import OrderSerializer, AddressSerializer
+from ecommerce.api.serializers import OrderSerializer, AddressSerializer, \
+    PaymentSerializer
 
 from common.utils.check import is_item_already_purchased, \
     is_coupon_used_by_current_user
@@ -231,3 +232,11 @@ class AddressViewSet(viewsets.ModelViewSet):
 class CountryListView(APIView):
     def get(self, request, *args, **kwargs):
         return Response(countries, status=HTTP_200_OK)
+
+
+class PaymentListView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = PaymentSerializer
+
+    def get_queryset(self):
+        return Payment.objects.filter(user=self.request.user)

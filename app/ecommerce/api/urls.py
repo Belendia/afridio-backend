@@ -3,13 +3,13 @@ from rest_framework.routers import DefaultRouter
 
 from .views import OrderListView, AddToCartView, OrderDetailView, \
     PaymentView, AddCouponView, AddressViewSet, CountryListView, \
-    OrderMediaDeleteView
+    OrderMediaDeleteView, PaymentListView
 
 app_name = 'ecommerce-api'
 
 router = DefaultRouter()
 
-router.register('addresses', AddressViewSet, 'address')
+router.register('addresses', AddressViewSet, 'addresses')
 
 urlpatterns = [
     path('shop/order/', OrderListView.as_view(), name='orders'),
@@ -21,6 +21,7 @@ urlpatterns = [
     path('shop/checkout/', PaymentView.as_view(), name='checkout'),
     path('shop/coupon/', AddCouponView.as_view(), name='add-coupon'),
     path('countries/', CountryListView.as_view(), name='country-list'),
+    path('payments/', PaymentListView.as_view(), name='payments-list')
 ]
 
 urlpatterns += router.urls

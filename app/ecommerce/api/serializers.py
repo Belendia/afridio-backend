@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django_countries.serializer_fields import CountryField
 
-from ecommerce.models import Order, OrderMedia, Coupon, Address
+from ecommerce.models import Order, OrderMedia, Coupon, Address, Payment
 from audio.serializers import MediaSerializer
 
 
@@ -76,4 +76,15 @@ class AddressSerializer(serializers.ModelSerializer):
             'country',
             'zip',
             'default'
+        )
+
+
+class PaymentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Payment
+        fields = (
+            'id',
+            'amount',
+            'timestamp'
         )
