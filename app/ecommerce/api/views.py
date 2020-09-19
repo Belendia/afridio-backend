@@ -28,10 +28,6 @@ from common.utils.check import is_item_already_purchased, \
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
-class OrderListView(ListAPIView):
-    pass
-
-
 class AddToCartView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -90,7 +86,9 @@ class OrderDetailView(RetrieveAPIView):
             raise Http404("You do not have an active order")
 
 
-class PaymentView(APIView):
+class CheckoutView(APIView):
+    permission_classes = (IsAuthenticated,)
+
     def post(self, request, *args, **kwargs):
         order = Order.objects.get(user=self.request.user, ordered=False)
         userprofile = UserProfile.objects.get(user=self.request.user)
@@ -98,7 +96,7 @@ class PaymentView(APIView):
         token = request.data.get('stripeToken')
 
         billing_address_id = request.data.get('billing_address')
-        billing_address = Address.objects.get(id=billing_address_id)
+        billing_address = Address.objects.get(slug=billing_address_id)
 
         if userprofile.stripe_customer_id != '' and \
                 userprofile.stripe_customer_id is not None:
