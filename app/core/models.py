@@ -90,7 +90,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Genre(models.Model):
-    """Genre to be used for a audio books and music"""
+    """Genre to be used for a media books and music"""
 
     name = models.CharField(max_length=255)
     slug = models.SlugField(blank=True, unique=True)
@@ -109,7 +109,7 @@ class Genre(models.Model):
 
 
 class Track(models.Model):
-    """Track to be used for a audio books and music"""
+    """Track to be used for a media books and music"""
 
     name = models.CharField(max_length=255)
     popularity = models.PositiveIntegerField()

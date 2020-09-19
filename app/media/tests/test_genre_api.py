@@ -8,10 +8,10 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from core.models import Genre, Media
-from audio.serializers import GenreSerializer
+from media.serializers import GenreSerializer
 
 
-GENRE_URL = reverse('audio:genres-list', kwargs={"version": "v1"})
+GENRE_URL = reverse('media:genres-list', kwargs={"version": "v1"})
 
 
 class PublicGenreApiTests(TestCase):
@@ -83,7 +83,7 @@ class PrivateGenreApiTest(TestCase):
         genre2 = Genre.objects.create(user=self.user, name='Novel')
 
         media = Media.objects.create(
-            title='Sample audio book',
+            title='Sample media book',
             word_count=14543,
             estimated_length_in_seconds=25000,
             price=12.50,
@@ -106,7 +106,7 @@ class PrivateGenreApiTest(TestCase):
         Genre.objects.create(user=self.user, name='Novel')
 
         media1 = Media.objects.create(
-            title='Sample audio book',
+            title='Sample media book',
             word_count=14543,
             estimated_length_in_seconds=25000,
             price=12.50,

@@ -7,13 +7,13 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter, OrderingFilter
 
 from core.models import Genre, Track, Media
-from audio import serializers
+from media import serializers
 
 
 class BaseViewSet(viewsets.GenericViewSet,
                   mixins.ListModelMixin,
                   mixins.CreateModelMixin):
-    """Base viewset for audio app"""
+    """Base viewset for media app"""
 
     authentication_classes = (TokenAuthentication,)
     permission_classes = (DjangoModelPermissionsOrAnonReadOnly, )

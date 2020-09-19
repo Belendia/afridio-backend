@@ -12,22 +12,22 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from core.models import Media, Genre, Track, User
-from audio.serializers import MediaSerializer, MediaDetailSerializer
+from media.serializers import MediaSerializer, MediaDetailSerializer
 
 
-MEDIA_URL = reverse('audio:medias-list', kwargs={"version": "v1"})
+MEDIA_URL = reverse('media:medias-list', kwargs={"version": "v1"})
 
 
 def image_upload_url(media_slug):
     """Return URL for media image upload"""
-    return reverse('audio:medias-image',
+    return reverse('media:medias-image',
                    kwargs={'slug': media_slug, 'version': 'v1'})
 
 
 def media_detail_url(media_slug):
     """Return media detail URL"""
 
-    return reverse('audio:medias-detail',
+    return reverse('media:medias-detail',
                    kwargs={'slug': media_slug, 'version': 'v1'})
 
 
@@ -55,7 +55,7 @@ def sample_media(user, **params):
     """Create and return a sample media"""
 
     defaults = {
-        'title': 'Sample audio book',
+        'title': 'Sample media book',
         'word_count': 14543,
         'estimated_length_in_seconds': 25000,
         'price': 12.50
@@ -113,7 +113,7 @@ class PrivateMediaApiTest(TestCase):
         """Test create a new media"""
 
         payload = {
-            'title': 'Sample audio book',
+            'title': 'Sample media book',
             'word_count': 14543,
             'estimated_length_in_seconds': 25000,
             'price': 12.50,

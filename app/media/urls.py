@@ -1,8 +1,8 @@
 from rest_framework.routers import DefaultRouter
 
-from audio import views
+from media import views
 
-app_name = 'audio'
+app_name = 'media'
 
 router = DefaultRouter()
 router.register('genres', views.GenreViewSet, 'genres')
