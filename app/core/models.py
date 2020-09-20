@@ -1,5 +1,4 @@
 import os
-import uuid
 from enum import Enum
 from secrets import token_urlsafe
 from allauth.account.signals import user_signed_up
@@ -19,9 +18,9 @@ def media_image_file_path(instance, filename):
     """Generate file path for new media cover image"""
 
     ext = filename.split('.')[-1]
-    filename = f'{uuid.uuid4()}.{ext}'
+    filename = f'{instance.slug}.{ext}'
 
-    return os.path.join('uploads/media/', filename)
+    return os.path.join(instance.media_format.lower(), 'cover', filename)
 
 
 class UserManager(BaseUserManager):
