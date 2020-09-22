@@ -95,7 +95,7 @@ class MediaViewSet(viewsets.ModelViewSet):
             data=request.data
         )
 
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
 
             if media.image:

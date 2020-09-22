@@ -2,6 +2,8 @@ from rest_framework import serializers
 
 from core.models import Genre, Track, Media
 
+from common.utils.validators import validate_image_size
+
 
 class GenreSerializer(serializers.ModelSerializer):
     """Serializer for genre objects"""
@@ -38,6 +40,8 @@ class MediaSerializer(serializers.ModelSerializer):
         queryset=Track.objects.all()
     )
 
+    image = serializers.ImageField(validators=[validate_image_size])
+
     class Meta:
         model = Media
         fields = ('title', 'price', 'discount_price', 'image', 'slug',
@@ -57,6 +61,8 @@ class MediaDetailSerializer(MediaSerializer):
 
 class MediaImageSerializer(serializers.ModelSerializer):
     """Serializer for uploading images to media"""
+
+    image = serializers.ImageField(validators=[validate_image_size])
 
     class Meta:
         model = Media
