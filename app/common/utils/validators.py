@@ -1,4 +1,5 @@
 # from mimetypes import MimeTypes
+import logging
 from PIL import Image
 
 from rest_framework.exceptions import ValidationError
@@ -10,7 +11,8 @@ def validate_image_size(temp_file):
         img = Image.open(temp_file)
         width, height = img.size
         max_width_height = max(width, height)
-    except:
+    except Exception as ex:
+        logging.error(ex)
         raise ValidationError(_('Unable to open file to check size'))
 
     if max_width_height < 300:
@@ -25,6 +27,6 @@ def validate_image_size(temp_file):
 #     allowed_types = ['image/jpeg', 'image/png']
 #     if file_type[0] not in allowed_types:
 #         return ValidationError(
-#             _('File type should be PNG or JPEG: [Current file type: %(type)]'),
+#           _('File type should be PNG or JPEG: [Current file type: %(type)]'),
 #             params={'type': file_type[0]},
 #         )

@@ -40,8 +40,6 @@ class MediaSerializer(serializers.ModelSerializer):
         queryset=Track.objects.all()
     )
 
-    image = serializers.ImageField(validators=[validate_image_size])
-
     class Meta:
         model = Media
         fields = ('title', 'price', 'discount_price', 'image', 'slug',
