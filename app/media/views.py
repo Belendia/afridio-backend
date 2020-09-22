@@ -99,7 +99,7 @@ class MediaViewSet(viewsets.ModelViewSet):
             serializer.save()
 
             if media.image:
-                resize_image.delay(media.image.name, (50, 50))
+                resize_image.delay(media.slug, media.image.name)
 
             return Response(
                 serializer.data,

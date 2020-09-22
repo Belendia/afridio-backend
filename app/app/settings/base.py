@@ -83,7 +83,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
-
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
@@ -106,7 +105,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -119,7 +117,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
@@ -211,3 +208,11 @@ SOCIALACCOUNT_PROVIDERS = {
         'VERSION': 'v8.0'
     }
 }
+
+# Image Manipulation
+WATERMARK_COVER_IMAGE = True
+LOGO_MAX_WIDTH_HEIGHT_RATIO = 0.06
+LOGO_TOP_LEFT_RATIO = 0.02
+COVER_IMAGE_CROP_SIZES = [(300, 300)]
+COVER_IMAGE_DIR = 'cover'
+

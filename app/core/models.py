@@ -20,7 +20,8 @@ def media_image_file_path(instance, filename):
     ext = filename.split('.')[-1]
     filename = f'{instance.slug}.{ext}'
 
-    return os.path.join(instance.media_format.lower(), 'cover', filename)
+    return os.path.join(instance.media_format.lower(),
+                        settings.COVER_IMAGE_DIR, filename)
 
 
 class UserManager(BaseUserManager):
