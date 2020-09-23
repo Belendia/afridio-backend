@@ -17,11 +17,16 @@ class GenreSerializer(serializers.ModelSerializer):
 
 class TrackSerializer(serializers.ModelSerializer):
     """Serializer for track objects"""
+    media_list = serializers.SlugRelatedField(
+        many=True,
+        slug_field='slug',
+        queryset=Media.objects.all()
+    )
 
     class Meta:
         model = Track
         fields = ('slug', 'name', 'popularity', 'file_url',
-                  'duration_ms', 'created', 'updated')
+                  'duration_ms', 'created', 'updated', 'media_list')
         read_only_fields = ('id', 'slug', 'file_url', 'created', 'updated')
         lookup_field = 'slug'
 
