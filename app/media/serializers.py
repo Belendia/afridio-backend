@@ -15,20 +15,44 @@ class GenreSerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
 
 
+class GenreDisplaySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Genre
+        fields = ('slug', 'name')
+
+
 class TrackSerializer(serializers.ModelSerializer):
     """Serializer for track objects"""
-    media_list = serializers.SlugRelatedField(
+
+    medias = serializers.SlugRelatedField(
         many=True,
         slug_field='slug',
         queryset=Media.objects.all()
     )
+    media_detail = serializers.SerializerMethodField()
 
     class Meta:
         model = Track
         fields = ('slug', 'name', 'popularity', 'file_url',
-                  'duration_ms', 'created', 'updated', 'media_list')
+                  'duration_ms', 'created', 'updated', 'medias',
+                  'media_detail')
         read_only_fields = ('id', 'slug', 'file_url', 'created', 'updated')
         lookup_field = 'slug'
+
+    def get_media_detail(self, obj):
+        return TrackMediasDisplaySerializer(obj.medias.all(),
+                                            many=True).data
+
+
+class TrackMediasDisplaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Media
+        fields = (
+            'slug',
+            'title'
+        )
+        read_only_fields = ('title', )
 
 
 class TrackFileSerializer(serializers.ModelSerializer):
@@ -43,7 +67,7 @@ class TrackFileSerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
 
 
-class MediaTracksSerializer(serializers.ModelSerializer):
+class MediaTracksDisplaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Track
         fields = (
@@ -62,20 +86,30 @@ class MediaSerializer(serializers.ModelSerializer):
         slug_field='slug',
         queryset=Genre.objects.all()
     )
+    genres_detail = serializers.SerializerMethodField()
 
-    tracks = serializers.SerializerMethodField()
+    tracks = serializers.SlugRelatedField(
+        many=True,
+        slug_field='slug',
+        queryset=Track.objects.all()
+    )
+    tracks_detail = serializers.SerializerMethodField()
 
     class Meta:
         model = Media
         fields = ('title', 'price', 'discount_price', 'image', 'slug',
                   'estimated_length_in_seconds', 'popularity', 'release_date',
                   'media_format', 'word_count', 'album_type', 'genres',
-                  'tracks', 'created', 'updated')
+                  'genres_detail', 'tracks', 'tracks_detail', 'created',
+                  'updated')
         read_only_fields = ('id', 'slug', 'created', 'updated')
         lookup_field = 'slug'
 
-    def get_tracks(self, obj):
-        return MediaTracksSerializer(obj.tracks.all(), many=True).data
+    def get_genres_detail(self, obj):
+        return GenreDisplaySerializer(obj.genres.all(), many=True).data
+
+    def get_tracks_detail(self, obj):
+        return MediaTracksDisplaySerializer(obj.tracks.all(), many=True).data
 
 
 class MediaDetailSerializer(MediaSerializer):

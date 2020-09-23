@@ -208,7 +208,7 @@ class Media(models.Model):
 
     # Relationships
     genres = models.ManyToManyField('Genre')
-    tracks = models.ManyToManyField('Track', related_name='media_list',
+    tracks = models.ManyToManyField('Track', related_name='medias',
                                     blank=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
