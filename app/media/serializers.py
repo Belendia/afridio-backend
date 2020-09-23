@@ -43,6 +43,17 @@ class TrackFileSerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
 
 
+class MediaTracksSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Track
+        fields = (
+            'slug',
+            'name',
+            'file_url'
+        )
+        read_only_fields = ('name', 'file_url')
+
+
 class MediaSerializer(serializers.ModelSerializer):
     """Serializer for media objects"""
 
@@ -51,11 +62,8 @@ class MediaSerializer(serializers.ModelSerializer):
         slug_field='slug',
         queryset=Genre.objects.all()
     )
-    tracks = serializers.SlugRelatedField(
-        many=True,
-        slug_field='slug',
-        queryset=Track.objects.all()
-    )
+
+    tracks = serializers.SerializerMethodField()
 
     class Meta:
         model = Media
@@ -65,6 +73,9 @@ class MediaSerializer(serializers.ModelSerializer):
                   'tracks', 'created', 'updated')
         read_only_fields = ('id', 'slug', 'created', 'updated')
         lookup_field = 'slug'
+
+    def get_tracks(self, obj):
+        return MediaTracksSerializer(obj.tracks.all(), many=True).data
 
 
 class MediaDetailSerializer(MediaSerializer):
