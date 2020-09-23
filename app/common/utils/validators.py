@@ -1,4 +1,4 @@
-# from mimetypes import MimeTypes
+import filetype
 import logging
 from PIL import Image
 
@@ -21,12 +21,17 @@ def validate_image_size(temp_file):
               'than 300px. [Current width: {}, Current height: {}]'
               .format(width, height)))
 
-# def validate_file_type(temp_file):
-#     mime = MimeTypes()
-#     file_type = mime.guess_type(temp_file)
-#     allowed_types = ['image/jpeg', 'image/png']
-#     if file_type[0] not in allowed_types:
-#         return ValidationError(
-#           _('File type should be PNG or JPEG: [Current file type: %(type)]'),
-#             params={'type': file_type[0]},
-#         )
+
+def validate_file_type(temp_file):
+    kind = filetype.guess(temp_file)
+    if kind is None:
+        raise ValidationError(
+            _("Can't determine file type.")
+        )
+    file_type = kind.mime
+    allowed_types = ['audio/mpeg', 'audio/ogg', 'video/mp4']
+    if file_type not in allowed_types:
+        raise ValidationError(
+          _('File type should be MP3, OGG, WMA or MP4: [Current file type: {}]'
+            .format(file_type))
+        )

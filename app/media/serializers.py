@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from core.models import Genre, Track, Media
 
-from common.utils.validators import validate_image_size
+from common.utils.validators import validate_image_size, validate_file_type
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -20,9 +20,21 @@ class TrackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Track
-        fields = ('slug', 'name', 'popularity', 'original_url',
+        fields = ('slug', 'name', 'popularity', 'file_url',
                   'duration_ms', 'created', 'updated')
-        read_only_fields = ('id', 'slug', 'original_url', 'created', 'updated')
+        read_only_fields = ('id', 'slug', 'file_url', 'created', 'updated')
+        lookup_field = 'slug'
+
+
+class TrackFileSerializer(serializers.ModelSerializer):
+    """Serializer for uploading media file to track"""
+
+    file_url = serializers.FileField(validators=[validate_file_type])
+
+    class Meta:
+        model = Media
+        fields = ('slug', 'file_url')
+        read_only_fields = ('slug', )
         lookup_field = 'slug'
 
 

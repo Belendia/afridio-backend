@@ -24,6 +24,22 @@ def media_image_file_path(instance, filename):
                         settings.COVER_IMAGE_DIR, filename)
 
 
+def track_file_path(instance, filename):
+    """Generate file path for new track file"""
+
+    ext = filename.split('.')[-1]
+    filename = f'{instance.slug}.{ext}'
+    print('!!!!!!!!!!!!!!!!!!!!!!!')
+    print('!!!!!!!!!!!!!!!!!!!!!!!')
+    print('!!!!!!!!!!!!!!!!!!!!!!!')
+    print(instance.media_set.all()) #[0].media_format.lower())
+    print('!!!!!!!!!!!!!!!!!!!!!!!')
+    print('!!!!!!!!!!!!!!!!!!!!!!!')
+    print('!!!!!!!!!!!!!!!!!!!!!!!')
+    return os.path.join('track',
+                        settings.TRACK_FILE_DIR, filename)
+
+
 class UserManager(BaseUserManager):
 
     def create_user(self, email, password=None, **kwargs):
@@ -113,7 +129,8 @@ class Track(models.Model):
 
     name = models.CharField(max_length=255)
     popularity = models.PositiveIntegerField()
-    original_url = models.URLField(max_length=200)
+    # original_url = models.URLField(max_length=200)
+    file_url = models.FileField(null=True, upload_to=track_file_path)
     duration_ms = models.PositiveIntegerField()
     slug = models.SlugField(blank=True, unique=True)
     created = models.DateTimeField(auto_now_add=True)

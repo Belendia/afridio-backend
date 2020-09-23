@@ -53,6 +53,40 @@ class TrackViewSet(BaseViewSet):
     queryset = Track.objects.all()
     serializer_class = serializers.TrackSerializer
 
+    def get_serializer_class(self):
+        """Return appropriate serializer class"""
+
+        if self.action == 'file':
+            return serializers.TrackFileSerializer
+
+        return self.serializer_class
+
+    @action(methods=['POST'], detail=True, url_path='file')
+    def file(self, request, slug=None, version=None, ):
+        """Upload a media file to a track"""
+
+        track = self.get_object()
+        serializer = self.get_serializer(
+            track,
+            data=request.data
+        )
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+
+            # if track.file:
+            #     resize_image.delay(media.slug, media.image.name)
+
+            return Response(
+                serializer.data,
+                status=status.HTTP_200_OK
+            )
+
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
     # def get_queryset(self):
     #     """Return objects for the current authenticated user"""
     #
