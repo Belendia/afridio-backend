@@ -32,11 +32,17 @@ def encode_track(slug, filename):
                 mp4_cloud_filename_with_path = replace_ext(
                     insert_text_in_file_name(filename, '-{}'.format(rate)),
                     "mp4")
+                mp4_offline_frag_filename = replace_ext(
+                    insert_text_in_file_name(offline_filename, '-{}-frg'.
+                                             format(rate)), "mp4")
                 if encode_audio(offline_filename, mp4_offline_filename, rate):
-                    upload_audio(mp4_offline_filename,
-                                 mp4_cloud_filename_with_path)
+                    if fragment(mp4_offline_filename,
+                                mp4_offline_frag_filename):
+                        upload_audio(mp4_offline_frag_filename,
+                                     mp4_cloud_filename_with_path)
 
                 os.remove(mp4_offline_filename)
+                os.remove(mp4_offline_frag_filename)
 
             os.remove(offline_filename)
     except ResponseError as err:
@@ -65,6 +71,21 @@ def encode_audio(offline_filename, mp4_offline_filename, bitrate):
                                 '-vn', '-c:a', 'aac', '-b:a', bitrate,
                                 '-ac', '2', '-r', '48k', '-pass', '2',
                                 mp4_offline_filename],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    out, err = process.communicate()
+
+    if process.returncode != 0:
+        logging.error(str(err))
+        return False
+
+    return True
+
+
+def fragment(mp4_offline_filename, mp4_offline_frag_filename):
+    process = subprocess.Popen(['mp4fragment', '--fragment-duration', '6000',
+                                mp4_offline_filename,
+                                mp4_offline_frag_filename],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
     out, err = process.communicate()
