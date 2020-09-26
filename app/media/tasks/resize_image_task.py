@@ -8,6 +8,7 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 
 from core.models import Media
+from common.utils.file_processor import preserve_original_file
 
 
 @task(name='resize_image')
@@ -92,25 +93,3 @@ def get_watermark_top_left(img):
     actual_img_width, actual_img_height = img.width, img.height
     return (int(actual_img_width * settings.LOGO_TOP_LEFT_RATIO),
             int(actual_img_height * settings.LOGO_TOP_LEFT_RATIO))
-
-
-def preserve_original_file(filename):
-    error = True
-    try:
-        client = default_storage.client
-        img_name = os.path.splitext(filename)[0]
-        ext = os.path.splitext(filename)[-1]
-        original_filename = "{}-{}{}".format(img_name, 'original', ext)
-        client.copy_object(settings.MINIO_STORAGE_MEDIA_BUCKET_NAME,
-                           original_filename,
-                           settings.MINIO_STORAGE_MEDIA_BUCKET_NAME + "/" +
-                           filename)
-        # remove original object
-        client.remove_object(settings.MINIO_STORAGE_MEDIA_BUCKET_NAME,
-                             filename)
-        error = False
-    except Exception as ex:
-        logging.error("Unable to preserve original file")
-        logging.error(ex)
-
-    return original_filename, error

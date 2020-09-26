@@ -29,15 +29,12 @@ def track_file_path(instance, filename):
 
     ext = filename.split('.')[-1]
     filename = f'{instance.slug}.{ext}'
-    print('!!!!!!!!!!!!!!!!!!!!!!!')
-    print('!!!!!!!!!!!!!!!!!!!!!!!')
-    print('!!!!!!!!!!!!!!!!!!!!!!!')
-    print(instance.media_set.all()) #[0].media_format.lower())
-    print('!!!!!!!!!!!!!!!!!!!!!!!')
-    print('!!!!!!!!!!!!!!!!!!!!!!!')
-    print('!!!!!!!!!!!!!!!!!!!!!!!')
-    return os.path.join('track',
-                        settings.TRACK_FILE_DIR, filename)
+
+    folder_name = 'track'
+    if instance.medias.all().count() > 0:
+        folder_name = instance.medias.all()[0].media_format.lower()
+
+    return os.path.join(folder_name, settings.TRACK_FILE_DIR, filename)
 
 
 class UserManager(BaseUserManager):

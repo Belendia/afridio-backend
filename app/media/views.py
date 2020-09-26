@@ -8,7 +8,8 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 
 from core.models import Genre, Track, Media
 from media import serializers
-from media.tasks import resize_image
+from media.tasks.resize_image_task import resize_image
+from media.tasks.encode_track_task import encode_track
 
 
 class BaseViewSet(viewsets.GenericViewSet,
@@ -74,8 +75,8 @@ class TrackViewSet(BaseViewSet):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
 
-            # if track.file:
-            #     resize_image.delay(media.slug, media.image.name)
+            if track.file_url:
+                encode_track.delay(track.slug, track.file_url.name)
 
             return Response(
                 serializer.data,
