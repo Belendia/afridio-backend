@@ -9,9 +9,7 @@ def preserve_original_file(filename):
     error = True
     try:
         client = default_storage.client
-        img_name = os.path.splitext(filename)[0]
-        ext = os.path.splitext(filename)[-1]
-        original_filename = "{}-{}{}".format(img_name, 'original', ext)
+        original_filename = insert_text_in_file_name(filename, '-original')
         client.copy_object(settings.MINIO_STORAGE_MEDIA_BUCKET_NAME,
                            original_filename,
                            settings.MINIO_STORAGE_MEDIA_BUCKET_NAME + "/" +
