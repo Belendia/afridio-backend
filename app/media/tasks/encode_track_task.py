@@ -2,6 +2,7 @@ import os
 import io
 import logging
 import subprocess
+import shutil
 
 from celery import task
 
@@ -19,9 +20,9 @@ from common.utils.file_processor import preserve_original_file, \
 def encode_track(slug, filename):
     cloud_filename, error = preserve_original_file(filename)
     offline_filename = os.path.basename(filename)
+    cloud_dir_name = os.path.dirname(filename)
 
     try:
-        client = default_storage.client
         if download_file(cloud_filename, offline_filename):
             # file is download form s3, continue processing the file
 
@@ -38,11 +39,19 @@ def encode_track(slug, filename):
                 if encode_audio(offline_filename, mp4_offline_filename, rate):
                     if fragment(mp4_offline_filename,
                                 mp4_offline_frag_filename):
-                        upload_audio(mp4_offline_frag_filename,
+                        upload_media(mp4_offline_frag_filename,
                                      mp4_cloud_filename_with_path)
 
-                os.remove(mp4_offline_filename)
-                os.remove(mp4_offline_frag_filename)
+                        local_dir_name = '{}-{}'.format(slug, rate)
+                        if convert_to_hls(local_dir_name,
+                                          mp4_offline_frag_filename):
+                            upload_media_dir(local_dir_name, cloud_dir_name)
+                            # remove dir after uploading it to s3
+                            shutil.rmtree(local_dir_name, ignore_errors=True)
+
+                        os.remove(mp4_offline_frag_filename)
+
+                    os.remove(mp4_offline_filename)
 
             os.remove(offline_filename)
     except ResponseError as err:
@@ -83,8 +92,8 @@ def encode_audio(offline_filename, mp4_offline_filename, bitrate):
 
 
 def fragment(mp4_offline_filename, mp4_offline_frag_filename):
-    process = subprocess.Popen(['mp4fragment', '--fragment-duration', '6000',
-                                mp4_offline_filename,
+    process = subprocess.Popen(['mp4fragment', '--fragment-duration',
+                                '6000', mp4_offline_filename,
                                 mp4_offline_frag_filename],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE)
@@ -97,7 +106,21 @@ def fragment(mp4_offline_filename, mp4_offline_frag_filename):
     return True
 
 
-def upload_audio(mp4_offline_filename, mp4_cloud_filename_with_path):
+def convert_to_hls(local_dir_name, mp4_offline_frag_filename):
+    process = subprocess.Popen(['mp4hls', '-f', '--output-dir', local_dir_name,
+                                mp4_offline_frag_filename],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    out, err = process.communicate()
+
+    if process.returncode != 0:
+        logging.error(str(err))
+        return False
+
+    return True
+
+
+def upload_media(mp4_offline_filename, mp4_cloud_filename_with_path):
     client = default_storage.client
     with open(mp4_offline_filename, 'rb') as f:
         buffer = io.BytesIO(f.read())
@@ -106,3 +129,19 @@ def upload_audio(mp4_offline_filename, mp4_cloud_filename_with_path):
                           os.path.getsize(mp4_offline_filename),
                           content_type='video/mp4')
 
+
+def upload_media_dir(local_dir_name, cloud_dir_name):
+    client = default_storage.client
+    # enumerate local files recursively
+    for root, dirs, files in os.walk(local_dir_name):
+        for filename in files:
+            # construct the full local path
+            local_file = os.path.join(root, filename)
+            cloud_filename_with_path = os.path.join(cloud_dir_name, local_file)
+
+            with open(local_file, 'rb') as f:
+                buffer = io.BytesIO(f.read())
+                client.put_object(settings.MINIO_STORAGE_MEDIA_BUCKET_NAME,
+                                  cloud_filename_with_path, buffer,
+                                  os.path.getsize(local_file),
+                                  content_type='video/mp4')
