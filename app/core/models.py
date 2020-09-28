@@ -18,10 +18,10 @@ def media_image_file_path(instance, filename):
     """Generate file path for new media cover image"""
 
     ext = filename.split('.')[-1]
-    filename = f'{instance.slug}.{ext}'
+    filename = f'cover.{ext}'
 
     return os.path.join(instance.media_format.lower(),
-                        settings.COVER_IMAGE_DIR, filename)
+                        settings.COVER_IMAGE_DIR, instance.slug, filename)
 
 
 def track_file_path(instance, filename):
