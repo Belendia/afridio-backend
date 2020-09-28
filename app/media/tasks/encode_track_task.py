@@ -27,7 +27,7 @@ def encode_track(slug, filename):
             # file is download form s3, continue processing the file
 
             # encode with 96k and 128k bit-rate for mobile and desktop
-            for rate in ['96k', '128k']:
+            for i, rate in enumerate(['96k', '128k']):
                 mp4_offline_filename = replace_ext(insert_text_in_file_name(
                     offline_filename, '-{}'.format(rate)), "mp4")
                 mp4_cloud_filename_with_path = replace_ext(
@@ -36,12 +36,19 @@ def encode_track(slug, filename):
                 mp4_offline_frag_filename = replace_ext(
                     insert_text_in_file_name(offline_filename, '-{}-frg'.
                                              format(rate)), "mp4")
+
+                # Encode file using two-pass encoding
                 if encode_audio(offline_filename, mp4_offline_filename, rate):
+
+                    # Uses the Bento4 mp4fragment utility to convert the MP4
+                    # files created by FFmpeg into fragmented MP4 files
+                    # required for the mp4-dash/ mp4-hls.
                     if fragment(mp4_offline_filename,
                                 mp4_offline_frag_filename):
                         upload_media(mp4_offline_frag_filename,
                                      mp4_cloud_filename_with_path)
 
+                        # Create HLS output
                         local_dir_name = '{}-{}'.format(slug, rate)
                         if convert_to_hls(local_dir_name,
                                           mp4_offline_frag_filename):
