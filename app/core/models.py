@@ -28,13 +28,14 @@ def track_file_path(instance, filename):
     """Generate file path for new track file"""
 
     ext = filename.split('.')[-1]
-    filename = f'{instance.slug}.{ext}'
+    filename = f'track.{ext}'
 
     folder_name = 'track'
     if instance.medias.all().count() > 0:
         folder_name = instance.medias.all()[0].media_format.lower()
 
-    return os.path.join(folder_name, settings.TRACK_FILE_DIR, filename)
+    return os.path.join(folder_name, settings.TRACK_FILE_DIR,
+                        instance.slug, filename)
 
 
 class UserManager(BaseUserManager):

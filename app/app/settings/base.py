@@ -217,4 +217,4 @@ COVER_IMAGE_CROP_SIZES = [(300, 300)]
 COVER_IMAGE_DIR = 'cover'
 
 # Track File
-TRACK_FILE_DIR = 'audio-video'
+TRACK_FILE_DIR = 'video'

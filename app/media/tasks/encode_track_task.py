@@ -45,7 +45,8 @@ def encode_track(slug, filename):
                         local_dir_name = '{}-{}'.format(slug, rate)
                         if convert_to_hls(local_dir_name,
                                           mp4_offline_frag_filename):
-                            upload_media_dir(local_dir_name, cloud_dir_name)
+                            upload_media_dir(slug, local_dir_name,
+                                             cloud_dir_name, 'hls')
                             # remove dir after uploading it to s3
                             shutil.rmtree(local_dir_name, ignore_errors=True)
 
@@ -130,14 +131,17 @@ def upload_media(mp4_offline_filename, mp4_cloud_filename_with_path):
                           content_type='video/mp4')
 
 
-def upload_media_dir(local_dir_name, cloud_dir_name):
+# Format = HLS or DASH
+def upload_media_dir(slug, local_dir_name, cloud_dir_name, format):
     client = default_storage.client
     # enumerate local files recursively
     for root, dirs, files in os.walk(local_dir_name):
         for filename in files:
             # construct the full local path
             local_file = os.path.join(root, filename)
-            cloud_filename_with_path = os.path.join(cloud_dir_name, local_file)
+
+            cloud_filename_with_path = os.path.join(cloud_dir_name, local_file
+                                                    .replace(slug, format))
 
             with open(local_file, 'rb') as f:
                 buffer = io.BytesIO(f.read())
