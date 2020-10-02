@@ -129,7 +129,9 @@ class UserProfile(models.Model):
     one_click_purchasing = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.user.email
+        if self.user.name:
+            return '{} - ({})'.format(self.user.name, self.user.phone)
+        return self.user.phone
 
 
 def userprofile_receiver(sender, instance, created, *args, **kwargs):
