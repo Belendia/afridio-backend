@@ -5,13 +5,14 @@ from allauth.account.signals import user_signed_up
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
-                                        PermissionsMixin, Group
+    PermissionsMixin, Group
 from django.conf import settings
 from django.db.models.signals import pre_save
 from django.utils.translation import ugettext_lazy as _
 from django.utils.text import slugify
 from django.shortcuts import reverse
 from django.dispatch import receiver
+from django.core.validators import RegexValidator
 
 
 def media_image_file_path(instance, filename):
@@ -40,19 +41,22 @@ def track_file_path(instance, filename):
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, email, password=None, **kwargs):
+    def create_user(self, phone, password=None, **kwargs):
         """Creates and saves a new user"""
 
-        if not email:
-            raise ValueError('Users must have email address')
+        if not phone:
+            raise ValueError('Users must have phone number')
 
-        user = self.model(email=self.normalize_email(email), **kwargs)
+        if not password:
+            raise ValueError('Users must have a password')
+
+        user = self.model(phone=phone, **kwargs)
         user.set_password(password)
         user.save(using=self._db)
 
         return user
 
-    def create_superuser(self, email, password, **extra_fields):
+    def create_superuser(self, phone, password, **extra_fields):
         """Creates and saves a new superuser"""
 
         extra_fields.setdefault('is_staff', True)
@@ -64,11 +68,16 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(_('Superuser must have is_superuser=True.'))
 
-        return self.create_user(email, password, **extra_fields)
+        return self.create_user(phone, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
     """Custom user model that supports using email instead of username"""
+
+    phone_regex = RegexValidator(regex=r'^\+?1?\d{9,14}$',
+                                 message="Phone number must be entered in the "
+                                         "format: '+251911999999'. Up to 14 "
+                                         "digits allowed.")
 
     class Sex(Enum):
         MALE = "MALE"
@@ -79,9 +88,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         def choices(cls):
             return [(key.value, key.name) for key in cls]
 
-    email = models.EmailField(max_length=255, unique=True)
+    email = models.EmailField(max_length=255, unique=True, blank=True,
+                              null=True)
     name = models.CharField(max_length=255)
-    phone = models.CharField(max_length=50, blank=True, null=True)
+    phone = models.CharField(max_length=15, validators=[phone_regex],
+                             unique=True)
     date_of_birth = models.DateField(blank=True, null=True)
     sex = models.CharField(max_length=20, choices=Sex.choices())
     picture = models.ImageField(blank=True, null=True)
@@ -100,7 +111,20 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = 'phone'
+
+    def __str__(self):
+        if self.name:
+            return self.name
+        return self.phone
+
+    def get_full_name(self):
+        if self.name:
+            return self.name
+        return self.phone
+
+    def get_short_name(self):
+        return self.phone
 
 
 class Genre(models.Model):
@@ -157,7 +181,7 @@ class Media(models.Model):
     image = models.ImageField(null=True, upload_to=media_image_file_path)
     slug = models.SlugField(blank=True, unique=True)
     estimated_length_in_seconds = models.PositiveIntegerField(null=True,
-                                                              blank=True,)
+                                                              blank=True, )
     popularity = models.PositiveIntegerField(null=True, blank=True)
     release_date = models.DateField(null=True)
     description = models.TextField()
