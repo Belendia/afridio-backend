@@ -21,6 +21,7 @@ from django.conf import settings
 urlpatterns = [
     re_path(r'api/(?P<version>[v1]+)/', include('media.urls')),
     re_path(r'api/(?P<version>[v1]+)/', include('user.urls')),
+    re_path(r'api/(?P<version>[v1]+)/', include('phone.urls')),
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('', include('ecommerce.urls')),

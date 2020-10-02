@@ -2,6 +2,7 @@ import os
 from enum import Enum
 from secrets import token_urlsafe
 from allauth.account.signals import user_signed_up
+import pyotp
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
@@ -52,6 +53,8 @@ class UserManager(BaseUserManager):
 
         user = self.model(phone=phone, **kwargs)
         user.set_password(password)
+        if kwargs.get('email'):
+            user.email = self.normalize_email(kwargs.get('email'))
         user.save(using=self._db)
 
         return user
@@ -88,14 +91,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         def choices(cls):
             return [(key.value, key.name) for key in cls]
 
+    phone = models.CharField(max_length=15, validators=[phone_regex],
+                             unique=True)
     email = models.EmailField(max_length=255, unique=True, blank=True,
                               null=True)
     name = models.CharField(max_length=255)
-    phone = models.CharField(max_length=15, validators=[phone_regex],
-                             unique=True)
     date_of_birth = models.DateField(blank=True, null=True)
     sex = models.CharField(max_length=20, choices=Sex.choices())
     picture = models.ImageField(blank=True, null=True)
+    slug = models.CharField(max_length=100, null=True, blank=True)
+    enable_2fa = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True)
@@ -125,6 +130,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.phone
+
+    def authenticate(self, otp):
+        """ This method authenticates the given otp"""
+        provided_otp = 0
+        try:
+            provided_otp = int(otp)
+        except:
+            return False
+        # Here we are using Time Based OTP. The interval is 300 seconds.
+        # otp must be provided within this interval or it's invalid
+        t = pyotp.TOTP(self.slug, interval=300)
+        return t.verify(provided_otp)
 
 
 class Genre(models.Model):

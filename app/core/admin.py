@@ -13,6 +13,9 @@ class UserAdmin(BaseUserAdmin):
         (_('Personal Info'), {
             'fields': ('name', 'sex', 'date_of_birth', 'email', 'picture')
         }),
+        (_('Auth'), {
+            'fields': ('enable_2fa', 'key')
+        }),
         (
             _('Permissions'),
             {'fields': ('is_active', 'is_staff', 'is_superuser')}
@@ -28,6 +31,9 @@ class UserAdmin(BaseUserAdmin):
         }),
         (_('Personal Info'), {
             'fields': ('name', 'sex', 'date_of_birth', 'email', 'picture')
+        }),
+        (_('Auth'), {
+            'fields': ('enable_2fa', 'key')
         }),
         (
             _('Permissions'),

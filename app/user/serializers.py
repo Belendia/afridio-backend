@@ -53,4 +53,7 @@ class UserSerializer(serializers.ModelSerializer):
         except Group.DoesNotExist:
             pass
 
+        # key = send_otp(user.phone)
+
+
         return user

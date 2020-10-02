@@ -11,7 +11,9 @@ djangorestframework==3.11.1
 filetype==1.0.7
 flake8==3.8.3
 Pillow==7.2.0
-python-decouple==3.3
 psycopg2>=2.7.5,<=2.8.5
+pyotp==2.4.0
+python-decouple==3.3
 redis==3.5.3
 stripe==2.51.0
+twilio==6.45.4
