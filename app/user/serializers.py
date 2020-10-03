@@ -4,6 +4,8 @@ from django.contrib.auth.models import Group
 
 from rest_framework import serializers
 
+from common.utils.sms import send_sms_code
+
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the users object"""
@@ -53,7 +55,6 @@ class UserSerializer(serializers.ModelSerializer):
         except Group.DoesNotExist:
             pass
 
-        # key = send_otp(user.phone)
-
+        send_sms_code(user)
 
         return user
