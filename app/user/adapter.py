@@ -16,6 +16,7 @@ class AccountAdapter(DefaultAccountAdapter):
         user.name = form.cleaned_data.get('name')
         user.sex = form.cleaned_data.get('sex')
         user.date_of_birth = form.cleaned_data.get('date_of_birth')
+        user.phone = form.cleaned_data.get('phone')
 
         user.save()
 
