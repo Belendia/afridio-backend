@@ -55,6 +55,11 @@ class UserSerializer(serializers.ModelSerializer):
         except Group.DoesNotExist:
             pass
 
+        # send SMS verification code
+        print('!!!!!!!!!!!!!!!!!!!!!!!!')
+        print('!!!!!!!!!!!!!!!!!!!!!!!!')
+        print('!!!!!!!!!!!!!!!!!!!!!!!!')
+        print(user.slug)
         send_sms_code(user)
 
         return user

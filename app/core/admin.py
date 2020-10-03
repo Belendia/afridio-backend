@@ -14,7 +14,7 @@ class UserAdmin(BaseUserAdmin):
             'fields': ('name', 'sex', 'date_of_birth', 'email', 'picture')
         }),
         (_('Auth'), {
-            'fields': ('enable_2fa', 'key')
+            'fields': ('enable_2fa', 'slug')
         }),
         (
             _('Permissions'),
@@ -33,7 +33,7 @@ class UserAdmin(BaseUserAdmin):
             'fields': ('name', 'sex', 'date_of_birth', 'email', 'picture')
         }),
         (_('Auth'), {
-            'fields': ('enable_2fa', 'key')
+            'fields': ('enable_2fa', 'slug')
         }),
         (
             _('Permissions'),

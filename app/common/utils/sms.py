@@ -1,6 +1,5 @@
 import pyotp
 from twilio.rest import Client as TwilioClient
-from decouple import config
 from django.conf import settings
 
 account_sid = settings.TWILIO_ACCOUNT_SID
