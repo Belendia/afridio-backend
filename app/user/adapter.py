@@ -4,6 +4,10 @@ from django.contrib.auth.models import Group
 
 class AccountAdapter(DefaultAccountAdapter):
 
+    # disable allauth user signup
+    def is_open_for_signup(self, request):
+        return False
+
     def save_user(self, request, user, form, commit=True):
         """
         This is called when saving user via allauth registration.

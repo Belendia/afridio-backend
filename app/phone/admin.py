@@ -1,4 +1,9 @@
 from django.contrib import admin
 from . import models
 
-admin.site.register(models.PhoneNumber)
+
+class PhoneNumberAdmin(admin.ModelAdmin):
+    list_display = ['number', 'verified']
+
+
+admin.site.register(models.PhoneNumber, PhoneNumberAdmin)

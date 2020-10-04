@@ -1,10 +1,11 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Group
 
 from rest_framework import serializers
 
 from common.utils.sms import send_sms_code
+from phone.models import PhoneNumber
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -27,21 +28,34 @@ class UserSerializer(serializers.ModelSerializer):
         )
         extra_kwargs = {
             'password': {
-                'write_only': True
+                'write_only': True,
+                'min_length': 8
             }
         }
 
-    def save(self, request):
+    # def create(self, validated_data):
+    #     """Create a new user with encrypted password and return it"""
+    #
+    #     password = validated_data.get('password', None)
+    #     password2 = validated_data.pop('confirm_password', None)
+    #
+    #     if password != password2:
+    #         msg = _('Passwords must match')
+    #         raise serializers.ValidationError({'password': msg})
+    #
+    #     return get_user_model().objects.create_user(**validated_data)
+
+    def create(self, validated_data):
         """Create a new user with encrypted password and return it"""
 
-        password = self.validated_data.get('password', None)
-        confirm_password = self.validated_data.pop('password2', None)
+        password = validated_data.get('password', None)
+        confirm_password = validated_data.pop('password2', None)
 
         if password != confirm_password:
             msg = _('Passwords must match')
             raise serializers.ValidationError({'password': msg})
 
-        user = get_user_model().objects.create_user(**self.validated_data)
+        user = get_user_model().objects.create_user(**validated_data)
 
         if password:
             user.set_password(password)
@@ -56,10 +70,43 @@ class UserSerializer(serializers.ModelSerializer):
             pass
 
         # send SMS verification code
-        print('!!!!!!!!!!!!!!!!!!!!!!!!')
-        print('!!!!!!!!!!!!!!!!!!!!!!!!')
-        print('!!!!!!!!!!!!!!!!!!!!!!!!')
-        print(user.slug)
-        send_sms_code(user)
+        if user.phone:
+            send_sms_code(user)
 
         return user
+
+
+class AuthTokenSerializer(serializers.Serializer):
+    """Serializer for the user authentication object"""
+
+    phone = serializers.CharField()
+    password = serializers.CharField(
+        style={'input_type': 'password'},
+        trim_whitespace=False
+    )
+
+    def validate(self, attrs):
+        """Validate and authenticate the user"""
+
+        phone = attrs.get('phone')
+        password = attrs.get('password')
+
+        has_verified_phone = PhoneNumber.objects.filter(number=phone,
+                                                        verified=True).exists()
+        if not has_verified_phone:
+            msg = _('Please verify your phone.')
+            raise serializers.ValidationError({'detail': msg})
+
+        user = authenticate(
+            request=self.context.get('request'),
+            username=phone,
+            password=password
+        )
+
+        if not user:
+            msg = _('Unable to authenticate with provided credentials')
+            raise serializers.ValidationError({'detail': msg})
+
+        attrs['user'] = user
+
+        return attrs

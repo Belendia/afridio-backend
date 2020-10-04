@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.facebook',
-    'rest_auth.registration',
+    # 'rest_auth.registration',
 
     # for django forms
     'crispy_forms',
@@ -155,13 +155,13 @@ AUTHENTICATION_BACKENDS = [
 
 SITE_ID = 1
 
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = True
-ACCOUNT_SESSION_REMEMBER = True
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_SESSION_REMEMBER = False
+ACCOUNT_AUTHENTICATION_METHOD = 'phone'
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'phone'
 ACCOUNT_FORMS = {'signup': 'core.forms.CustomSignupForm'}
 ACCOUNT_ADAPTER = 'user.adapter.AccountAdapter'
 ACCOUNT_EMAIL_VERIFICATION = False

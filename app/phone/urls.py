@@ -9,7 +9,7 @@ router.register(r'phones', views.PhoneViewset)
 
 urlpatterns = [
     path('send_sms_code/', views.SendSMS.as_view(), name='send_sms_code'),
-    path('verify_phone/<int:sms_code>', views.VerifyPhone.as_view(),
+    path('verify_phone/', views.VerifyOTPANDLogin.as_view(),
          name='verify_phone'),
 ]
 
