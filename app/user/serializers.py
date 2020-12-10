@@ -93,9 +93,6 @@ class AuthTokenSerializer(serializers.Serializer):
 
         has_verified_phone = PhoneNumber.objects.filter(number=phone,
                                                         verified=True).exists()
-        if not has_verified_phone:
-            msg = _('Please verify your phone.')
-            raise serializers.ValidationError({'detail': msg})
 
         user = authenticate(
             request=self.context.get('request'),
@@ -105,6 +102,10 @@ class AuthTokenSerializer(serializers.Serializer):
 
         if not user:
             msg = _('Unable to authenticate with provided credentials')
+            raise serializers.ValidationError({'detail': msg})
+
+        if not has_verified_phone:
+            msg = _('Please verify your phone.')
             raise serializers.ValidationError({'detail': msg})
 
         attrs['user'] = user
