@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
+from rest_framework.authtoken.models import Token
 
 from common.utils.sms import send_sms_code
 from .serializers import PhoneNumberSerializer, VerifyOTPAndLoginSerializer

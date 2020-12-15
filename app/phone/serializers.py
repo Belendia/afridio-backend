@@ -31,10 +31,11 @@ class VerifyOTPAndLoginSerializer(serializers.Serializer):
         try:
             user = User.objects.get(phone=phone_number)
             if not user.check_password(password):
-                msg = _("User doesn't exist")
+                msg = _("Unable to authenticate the user")
                 raise serializers.ValidationError({'detail': msg})
         except User.DoesNotExist:
-            pass
+            msg = _("User doesn't exist")
+            raise serializers.ValidationError({'detail': msg})
 
         if user.authenticate(code):
             phone = user.phonenumber
