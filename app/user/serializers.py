@@ -71,7 +71,13 @@ class UserSerializer(serializers.ModelSerializer):
 
         # send SMS verification code
         if user.phone:
-            send_sms_code(user)
+            try:
+                send_sms_code(user)
+            except:
+                msg = _('Account verification SMS could not be sent')
+                res = serializers.ValidationError({'detail': msg})
+                res.status_code = 500
+                raise res
 
         return user
 
