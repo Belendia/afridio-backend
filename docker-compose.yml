@@ -16,7 +16,7 @@ services:
       - db
       - redis
       - broker
-#      - minio
+      - minio
     restart: on-failure
   worker:
     build:
@@ -55,16 +55,16 @@ services:
       - "15672:15672"
       - "5671:5671"
 #  # MinIO
-#  minio:
-#    image: minio/minio
-#    command: server /data
-#    environment:
-#      - MINIO_STORAGE_ENDPOINT=minio:9000
-#      - MINIO_ACCESS_KEY=weak_password
-#      - MINIO_SECRET_KEY=weak_password
-#    restart: on-failure
-#    ports:
-#      - "9000:9000"
-#    volumes:
-#      - ./storage/minio:/Users/belendia/minio
+  minio:
+    image: minio/minio
+    command: server /data
+    environment:
+      - MINIO_STORAGE_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+    restart: on-failure
+    ports:
+      - "9000:9000"
+    volumes:
+      - /Users/belendia/minio:/data
 
