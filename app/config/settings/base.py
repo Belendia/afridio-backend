@@ -38,11 +38,11 @@ INSTALLED_APPS = [
     'crispy_forms',
 
     # Local apps
-    'core',
-    'user',
-    'media',
-    'ecommerce',
-    'phone',
+    'apps.user',
+    'apps.media',
+    'apps.ecommerce',
+    'apps.phone',
+    'apps.common',
 ]
 
 MIDDLEWARE = [
@@ -122,7 +122,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 
-AUTH_USER_MODEL = 'core.User'
+AUTH_USER_MODEL = 'user.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

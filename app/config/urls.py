@@ -19,12 +19,12 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 urlpatterns = [
-    re_path(r'api/(?P<version>[v1]+)/', include('media.urls')),
-    re_path(r'api/(?P<version>[v1]+)/', include('user.urls')),
-    re_path(r'api/(?P<version>[v1]+)/', include('phone.urls')),
+    re_path(r'api/(?P<version>[v1]+)/', include('apps.media.urls')),
+    re_path(r'api/(?P<version>[v1]+)/', include('apps.user.urls')),
+    re_path(r'api/(?P<version>[v1]+)/', include('apps.phone.urls')),
     path('admin/', admin.site.urls),
-    path('', include('ecommerce.urls')),
-    re_path(r'api/(?P<version>[v1]+)/', include('ecommerce.api.urls')),
+    path('', include('apps.ecommerce.urls')),
+    re_path(r'api/(?P<version>[v1]+)/', include('apps.ecommerce.api.urls')),
 ]
 
 if settings.DEBUG:
