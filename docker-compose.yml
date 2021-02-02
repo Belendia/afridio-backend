@@ -9,9 +9,9 @@ services:
     volumes:
       - ./app:/app
     command: >
-      sh -c "python manage.py wait_for_db --settings=app.settings.development &&
-             python manage.py migrate --settings=app.settings.development &&
-             python manage.py runserver 0.0.0.0:8000 --settings=app.settings.development"
+      sh -c "python manage.py wait_for_db --settings=config.settings.development &&
+             python manage.py migrate --settings=config.settings.development &&
+             python manage.py runserver 0.0.0.0:8000 --settings=config.settings.development"
     depends_on:
       - db
       - redis
@@ -24,7 +24,7 @@ services:
     volumes:
       - ./app:/app
     command: >
-      celery -A app  worker -l info
+      celery -A config  worker -l info
     depends_on:
       - broker
       - redis

@@ -33,15 +33,6 @@ INSTALLED_APPS = [
     # django rest frameworks
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_auth',
-
-    # for social login
-    'django.contrib.sites',
-    # 'allauth',
-    # 'allauth.account',
-    # 'allauth.socialaccount',
-    # 'allauth.socialaccount.providers.facebook',
-    # 'rest_auth.registration',
 
     # for django forms
     'crispy_forms',
@@ -145,50 +136,11 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSION': 'v1'
 }
 
-AUTHENTICATION_BACKENDS = [
-    # Needed to login by username in Django admin, regardless of `allauth`
-    'django.contrib.auth.backends.ModelBackend',
-
-    # `allauth` specific authentication methods, such as login by e-mail
-    #'allauth.account.auth_backends.AuthenticationBackend',
-]
-
-SITE_ID = 1
-
 LOGIN_REDIRECT_URL = '/'
 
 # CRISPY FORMS
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
-# Send email
-EMAIL_TIMEOUT = 5
-EMAIL_USE_TLS = True
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-# Facebook login
-SOCIALACCOUNT_PROVIDERS = {
-    'facebook': {
-        'SCOPE': [
-            'email',
-            'public_profile',
-            'user_friends'
-        ],
-        'FIELDS': [
-            'id',
-            'email',
-            'name',
-            'gender',
-        ],
-        'AUTH_PARAMS': {
-            # 'auth_type': 'reauthenticate'
-        },
-        'METHOD': 'oauth2',
-        # 'LOCALE_FUNC': 'path.to.callable',
-        'VERIFIED_EMAIL': True,
-        'VERSION': 'v8.0'
-    }
-}
 
 # Image Manipulation
 WATERMARK_COVER_IMAGE = True
