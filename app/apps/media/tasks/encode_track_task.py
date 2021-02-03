@@ -4,7 +4,7 @@ import logging
 import subprocess
 import shutil
 
-from celery import task
+from celery.decorators import task
 
 from django.core.files.storage import default_storage
 from django.conf import settings

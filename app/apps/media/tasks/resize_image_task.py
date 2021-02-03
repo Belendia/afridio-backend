@@ -1,7 +1,7 @@
 import os
 import logging
 from PIL import Image
-from celery import task
+from celery.decorators import task
 from tempfile import TemporaryFile
 
 from django.core.files.storage import default_storage
