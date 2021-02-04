@@ -1,4 +1,3 @@
-import pyotp
 from enum import Enum
 
 from django.db import models
@@ -10,16 +9,16 @@ from django.utils.translation import ugettext_lazy as _
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, phone, password=None, **kwargs):
+    def create_user(self, phone_number, password=None, **kwargs):
         """Creates and saves a new user"""
 
-        if not phone:
+        if not phone_number:
             raise ValueError('Users must have phone number')
 
         if not password:
             raise ValueError('Users must have a password')
 
-        user = self.model(phone=phone, **kwargs)
+        user = self.model(phone_number=phone_number, **kwargs)
         user.set_password(password)
         if kwargs.get('email'):
             user.email = self.normalize_email(kwargs.get('email'))
@@ -27,7 +26,7 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def create_superuser(self, phone, password, **extra_fields):
+    def create_superuser(self, phone_number, password, **extra_fields):
         """Creates and saves a new superuser"""
 
         extra_fields.setdefault('is_staff', True)
@@ -39,7 +38,7 @@ class UserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(_('Superuser must have is_superuser=True.'))
 
-        return self.create_user(phone, password, **extra_fields)
+        return self.create_user(phone_number, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -59,7 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         def choices(cls):
             return [(key.value, key.name) for key in cls]
 
-    phone = models.CharField(max_length=15, validators=[phone_regex],
+    phone_number = models.CharField(max_length=15, validators=[phone_regex],
                              unique=True)
     email = models.EmailField(max_length=255, unique=True, blank=True,
                               null=True)
@@ -84,7 +83,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'phone'
+    USERNAME_FIELD = 'phone_number'
 
     class Meta:
         verbose_name = 'user'
@@ -93,24 +92,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         if self.name:
             return self.name
-        return self.phone
+        return self.phone_number
 
     def get_full_name(self):
         if self.name:
             return self.name
-        return self.phone
+        return self.phone_number
 
     def get_short_name(self):
-        return self.phone
-
-    def authenticate(self, otp):
-        """ This method authenticates the given otp"""
-        provided_otp = 0
-        try:
-            provided_otp = int(otp)
-        except:
-            return False
-        # Here we are using Time Based OTP. The interval is 300 seconds.
-        # otp must be provided within this interval or it's invalid
-        t = pyotp.TOTP(self.slug, interval=300)
-        return t.verify(provided_otp)
+        return self.phone_number

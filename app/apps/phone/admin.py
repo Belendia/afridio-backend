@@ -3,7 +3,7 @@ from . import models
 
 
 class PhoneNumberAdmin(admin.ModelAdmin):
-    list_display = ['number', 'verified']
+    list_display = ['phone_number', 'is_verified']
 
 
-admin.site.register(models.PhoneNumber, PhoneNumberAdmin)
+admin.site.register(models.PhoneVerification, PhoneNumberAdmin)

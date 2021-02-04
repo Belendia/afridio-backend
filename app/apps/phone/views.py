@@ -1,35 +1,34 @@
-from django.contrib.auth import authenticate
-from rest_framework.views import APIView
-from rest_framework import viewsets
-from rest_framework import permissions
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+# from django.contrib.auth import authenticate
+# from rest_framework.views import APIView
+# from rest_framework import viewsets
+# from rest_framework import permissions
+# from rest_framework.response import Response
+# from rest_framework.decorators import api_view, permission_classes
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
-from rest_framework.authtoken.models import Token
+# from rest_framework.authtoken.models import Token
 
-from apps.common.utils.sms import send_sms_code
-from .serializers import PhoneNumberSerializer, VerifyOTPAndLoginSerializer
-from .models import PhoneNumber
-
-
-class PhoneViewset(viewsets.ModelViewSet):
-    queryset = PhoneNumber.objects.all()
-    serializer_class = PhoneNumberSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def perform_create(self, serializer):
-        """Associate user with phone number"""
-
-        serializer.save(user=self.request.user)
+from .serializers import VerifyPhoneNumberAndLoginSerializer
+# from .models import PhoneNumber
 
 
-class SendSMS(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
+# class PhoneViewset(viewsets.ModelViewSet):
+#     queryset = PhoneNumber.objects.all()
+#     serializer_class = PhoneNumberSerializer
+#     permission_classes = (permissions.IsAuthenticated,)
+#
+#     def perform_create(self, serializer):
+#         """Associate user with phone number"""
+#
+#         serializer.save(user=self.request.user)
 
-    def get(self, request, *args, **kwargs):
-        send_sms_code(request.user)
-        return Response(status=200)
+
+# class SendSMS(APIView):
+#     permission_classes = (permissions.IsAuthenticated,)
+#
+#     def get(self, request, *args, **kwargs):
+#         send_sms_code(request.user)
+#         return Response(status=200)
 
 
 # class VerifyPhone(APIView):
@@ -62,8 +61,8 @@ class SendSMS(APIView):
 #             Response(dict(detail="Code should be integer"), status=400)
 
 
-class VerifyOTPANDLogin(ObtainAuthToken):
+class VerifyPhoneNumberANDLoginViewSet(ObtainAuthToken):
     """Create a new auth token for user"""
 
-    serializer_class = VerifyOTPAndLoginSerializer
+    serializer_class = VerifyPhoneNumberAndLoginSerializer
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES

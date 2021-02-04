@@ -153,6 +153,19 @@ COVER_IMAGE_DIR = 'cover'
 TRACK_FILE_DIR = 'video'
 
 # Twilio
-TWILIO_PHONE = config('TWILIO_PHONE')
-TWILIO_ACCOUNT_SID = config('TWILIO_ACCOUNT_SID')
-TWILIO_AUTH_TOKEN = config('TWILIO_AUTH_TOKEN')
+
+PHONE_VERIFICATION = {
+    'BACKEND': 'apps.phone.backends.twilio.TwilioBackend',
+    'OPTIONS': {
+        'SID': config('TWILIO_ACCOUNT_SID'),
+        'SECRET': "fake",
+        'FROM': config('TWILIO_PHONE'),
+        "SANDBOX_TOKEN": config('TWILIO_AUTH_TOKEN'),
+    },
+    "TOKEN_LENGTH": 6,
+    "MESSAGE": "Welcome to {app}! Please use security code {security_code} to proceed.",
+    "APP_NAME": "Afridio",
+    "SECURITY_CODE_EXPIRATION_TIME": 3600,  # In seconds only
+    "VERIFY_SECURITY_CODE_ONLY_ONCE": False,  # If False, then a security code can be used multiple times for verification
+}
+
