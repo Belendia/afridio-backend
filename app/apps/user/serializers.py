@@ -88,7 +88,6 @@ class LoginSerializer(serializers.Serializer):
         password = attrs.get('password')
 
         sms_backend = get_sms_backend()
-        is_phone_verified = sms_backend.is_phone_number_verified(phone_number)
 
         user = authenticate(
             request=self.context.get('request'),
@@ -100,7 +99,7 @@ class LoginSerializer(serializers.Serializer):
             msg = _('Unable to authenticate with provided credentials')
             raise serializers.ValidationError({'detail': msg})
 
-        if not is_phone_verified:
+        if not sms_backend.is_phone_number_verified(phone_number):
             """
             TODO: 
              - check if the phone is is registered in the PhoneVerification model

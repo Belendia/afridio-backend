@@ -148,4 +148,4 @@ class BaseBackend(metaclass=ABCMeta):
             is_verified=True, phone_number=phone_number
         ).first()
 
-        return stored_verification is None
+        return stored_verification is not None
