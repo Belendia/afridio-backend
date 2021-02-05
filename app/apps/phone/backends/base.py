@@ -73,7 +73,7 @@ class BaseBackend(metaclass=ABCMeta):
         first place.
 
         :param number: Phone number of recipient
-
+        :param user: user object of recipient
         :return security_code: string of sha security_code
         :return session_token: string of session_token
         """

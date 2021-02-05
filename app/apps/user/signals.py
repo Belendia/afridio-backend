@@ -5,7 +5,6 @@ from django.dispatch import receiver
 from django.conf import settings
 
 from core.models import User
-from phone.models import PhoneNumber
 
 
 def generate_key():
@@ -29,10 +28,3 @@ def create_key(sender, instance, **kwargs):
     """This creates the slug for users that don't have slugs"""
     if not instance.slug:
         instance.slug = generate_key()
-
-
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_profile_for_new_user(sender, created, instance, **kwargs):
-    if created:
-        phone = PhoneNumber(user=instance, number=instance.phone)
-        phone.save()

@@ -11,6 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     password2 = serializers.CharField(style={'input_type': 'password'},
                                       write_only=True)
+    session_token = serializers.CharField(required=False)
 
     class Meta:
         model = get_user_model()
@@ -21,9 +22,11 @@ class UserSerializer(serializers.ModelSerializer):
             'phone_number',
             'date_of_birth',
             'picture',
+            'session_token',
             'password',
             'password2'
         )
+        read_only_fields = ['session_token']
         extra_kwargs = {
             'password': {
                 'write_only': True,
@@ -56,10 +59,10 @@ class UserSerializer(serializers.ModelSerializer):
             pass
 
         # send SMS verification code
-        session_token = None
+        device_session_token = None
         if user.phone_number:
             try:
-                session_token = send_security_code_and_generate_session_token(
+                device_session_token = send_security_code_and_generate_session_token(
                     user.phone_number, user
                 )
             except:
@@ -68,8 +71,22 @@ class UserSerializer(serializers.ModelSerializer):
                 res.status_code = 500
                 raise res
 
+            if device_session_token is None:
+                msg = _('Account verification SMS could not be sent')
+                res = serializers.ValidationError({'detail': msg})
+                res.status_code = 500
+                raise res
         # return {'user': user, 'session_token': session_token}
-        return user
+        attrs = {
+            'email': user.email,
+            'name': user.name,
+            'sex': user.sex,
+            'phone_number': user.phone_number,
+            'date_of_birth': user.date_of_birth,
+            'picture': user.picture,
+            'session_token': device_session_token
+        }
+        return attrs
 
 
 class LoginSerializer(serializers.Serializer):
