@@ -158,7 +158,7 @@ PHONE_VERIFICATION = {
     'BACKEND': 'apps.phone.backends.twilio.TwilioBackend',
     'OPTIONS': {
         'SID': config('TWILIO_ACCOUNT_SID'),
-        'SECRET': "fake",
+        'SECRET': config('TWILIO_AUTH_TOKEN'),
         'FROM': config('TWILIO_PHONE'),
         "SANDBOX_TOKEN": config('TWILIO_AUTH_TOKEN'),
     },

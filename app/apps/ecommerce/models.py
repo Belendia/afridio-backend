@@ -130,8 +130,8 @@ class UserProfile(models.Model):
 
     def __str__(self):
         if self.user.name:
-            return '{} - ({})'.format(self.user.name, self.user.phone)
-        return self.user.phone
+            return '{} - ({})'.format(self.user.name, self.user.phone_number)
+        return self.user.phone_number
 
 
 def userprofile_receiver(sender, instance, created, *args, **kwargs):

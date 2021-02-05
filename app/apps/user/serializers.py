@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model, authenticate
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Group
-
 from rest_framework import serializers
+from apps.phone.backends import get_sms_backend
+from apps.common.utils.phone_verification_services import send_security_code_and_generate_session_token
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -58,9 +59,8 @@ class UserSerializer(serializers.ModelSerializer):
         session_token = None
         if user.phone_number:
             try:
-                send_sms_code(user)
                 session_token = send_security_code_and_generate_session_token(
-                    user.phone_number
+                    user.phone_number, user
                 )
             except:
                 msg = _('Account verification SMS could not be sent')
@@ -68,7 +68,8 @@ class UserSerializer(serializers.ModelSerializer):
                 res.status_code = 500
                 raise res
 
-        return {'user': user, 'session_token': session_token}
+        # return {'user': user, 'session_token': session_token}
+        return user
 
 
 class LoginSerializer(serializers.Serializer):

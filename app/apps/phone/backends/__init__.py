@@ -9,6 +9,7 @@ backend = None
 
 
 def get_sms_backend():
+
     if not backend:
 
         if settings.PHONE_VERIFICATION.get("BACKEND", None):
@@ -19,4 +20,5 @@ def get_sms_backend():
             )
 
         backend_cls = import_string(backend_import)
+
         return backend_cls(**settings.PHONE_VERIFICATION["OPTIONS"])

@@ -5,7 +5,7 @@ import logging
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-from .backends import get_sms_backend
+from apps.phone.backends import get_sms_backend
 
 logger = logging.getLogger(__name__)
 
@@ -64,11 +64,13 @@ class PhoneVerificationService(object):
             )
 
 
-def send_security_code_and_generate_session_token(phone_number):
+def send_security_code_and_generate_session_token(phone_number, user):
     sms_backend = get_sms_backend()
+
     security_code, session_token = sms_backend.create_security_code_and_session_token(
-        phone_number
+        phone_number, user
     )
+
     service = PhoneVerificationService(phone_number=phone_number)
     try:
         service.send_verification(phone_number, security_code)

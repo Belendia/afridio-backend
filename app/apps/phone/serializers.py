@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from .models import PhoneVerification
 from apps.user.models import User
+from apps.phone.backends import get_sms_backend
 
 
 class VerifyPhoneNumberAndLoginSerializer(serializers.Serializer):

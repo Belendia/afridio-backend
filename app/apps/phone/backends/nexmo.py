@@ -7,7 +7,7 @@ from nexmo.errors import ClientError
 
 # Local
 from .base import BaseBackend
-from phone_verify.models import PhoneVerification
+from apps.phone.models import PhoneVerification
 
 
 class NexmoBackend(BaseBackend):

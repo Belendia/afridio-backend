@@ -7,7 +7,7 @@ from twilio.rest import Client as TwilioRestClient
 
 # Local
 from .base import BaseBackend
-from phone_verify.models import PhoneVerification
+from apps.phone.models import PhoneVerification
 
 
 class TwilioBackend(BaseBackend):
@@ -23,6 +23,7 @@ class TwilioBackend(BaseBackend):
         self.exception_class = TwilioRestException
 
     def send_sms(self, number, message):
+
         self.client.messages.create(to=number, body=message, from_=self._from)
 
     def send_bulk_sms(self, numbers, message):
@@ -44,6 +45,7 @@ class TwilioSandboxBackend(BaseBackend):
         self.exception_class = TwilioRestException
 
     def send_sms(self, number, message):
+
         self.client.messages.create(to=number, body=message, from_=self._from)
 
     def send_bulk_sms(self, numbers, message):
