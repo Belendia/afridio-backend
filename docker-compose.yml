@@ -31,7 +31,7 @@ services:
       - db
     restart: on-failure
   db:
-    image: postgres:9.6.19-alpine
+    image: postgres:9.6.21-alpine
     ports:
       - "5435:5432"
     environment:
@@ -39,6 +39,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres123882
     restart: on-failure
+    volumes:
+      - /Users/belendia/.postgres:/var/lib/postgresql/data
   # Redis
   redis:
     image: redis:6.0.8-alpine
