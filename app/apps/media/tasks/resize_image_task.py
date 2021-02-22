@@ -15,7 +15,7 @@ from apps.common.utils.file_processor import preserve_original_file
 def resize_image(slug, filename):
 
     if settings.COVER_IMAGE_CROP_SIZES.__len__() > 0:
-        original_filename, error = preserve_original_file(filename)
+        error = preserve_original_file(filename)
 
         if error:
             return
@@ -25,7 +25,7 @@ def resize_image(slug, filename):
             client = default_storage.client
             img_file = client.get_object(settings.
                                          MINIO_STORAGE_MEDIA_BUCKET_NAME,
-                                         original_filename)
+                                         filename)
 
             base_img = Image.open(img_file).convert("RGBA")
 
@@ -72,7 +72,7 @@ def resize_image(slug, filename):
                               resize_img_name, f, length,
                               content_type='image/png')
     except Exception as ex:
-        logging.error("Unable to resize image: {}".format(original_filename))
+        logging.error("Unable to resize image: {}".format(filename))
         logging.error(ex)
 
 
