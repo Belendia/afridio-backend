@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     # django rest frameworks
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_nested',
 
     # for django forms
     'crispy_forms',
