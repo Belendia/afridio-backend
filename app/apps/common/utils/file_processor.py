@@ -7,6 +7,7 @@ from django.core.files.storage import default_storage
 
 def preserve_original_file(filename):
     error = True
+    original_filename = None
     try:
         client = default_storage.client
         original_filename = insert_text_in_file_name(filename, '-original')
@@ -14,6 +15,7 @@ def preserve_original_file(filename):
                            original_filename,
                            settings.MINIO_STORAGE_MEDIA_BUCKET_NAME + "/" +
                            filename)
+
         # remove original object
         # client.remove_object(settings.MINIO_STORAGE_MEDIA_BUCKET_NAME,
         #                      filename)
@@ -22,7 +24,7 @@ def preserve_original_file(filename):
         logging.error("Unable to preserve original file")
         logging.error(ex)
 
-    return error
+    return original_filename, error
 
 
 def insert_text_in_file_name(filename, text):

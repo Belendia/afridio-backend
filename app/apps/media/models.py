@@ -63,6 +63,7 @@ class Track(models.Model):
     file_url = models.FileField(null=True, upload_to=track_file_path)
     duration_ms = models.PositiveIntegerField()
     slug = models.SlugField(blank=True, unique=True)
+    sample = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -90,7 +91,7 @@ class Media(models.Model):
     slug = models.SlugField(blank=True, unique=True)
     estimated_length_in_seconds = models.PositiveIntegerField(null=True,
                                                               blank=True, )
-    popularity = models.PositiveIntegerField(null=True, blank=True)
+    rating = models.PositiveIntegerField(null=True, blank=True)
     release_date = models.DateField(null=True)
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True)

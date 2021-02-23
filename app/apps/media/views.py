@@ -34,18 +34,18 @@ class GenreViewSet(BaseViewSet):
     queryset = Genre.objects.all()
     serializer_class = serializers.GenreSerializer
 
-    def get_queryset(self):
-        """Return filtered objects"""
-
-        assigned_only = bool(
-            int(self.request.query_params.get('assigned_only', 0))
-        )
-
-        queryset = self.queryset
-        if assigned_only:
-            queryset = queryset.filter(media__isnull=False).distinct()
-
-        return queryset
+    # def get_queryset(self):
+    #     """Return filtered objects"""
+    #
+    #     assigned_only = bool(
+    #         int(self.request.query_params.get('assigned_only', 0))
+    #     )
+    #
+    #     queryset = self.queryset
+    #     if assigned_only:
+    #         queryset = queryset.filter(media__isnull=False).distinct()
+    #
+    #     return queryset
 
 
 class TrackViewSet(BaseViewSet):
@@ -167,3 +167,27 @@ class MediaViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(tracks__slug__in=track_slugs)
 
         return queryset  # .filter(user=self.request.user)
+
+
+class HomeAPIView(viewsets.ModelViewSet):
+    """Custom queryset api view. Does not implement pagination"""
+
+    pagination_class = None
+    authentication_classes = (TokenAuthentication,)
+    slice_size = 5  # count limit for each of the source queries
+    serializer_class = serializers.MediaSerializer
+    queryset = Media.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        art_qs = self.get_queryset().filter(genres__name__in=["Art"])[:self.slice_size]
+        art_serializer = self.get_serializer(art_qs, many=True)
+
+        novel_qs = self.get_queryset().filter(genres__name__in=["Novel"])[:self.slice_size]
+        novel_serializer = self.get_serializer(novel_qs, many=True)
+
+        fiction_qs = self.get_queryset().filter(genres__name__in=["Fiction"])[:self.slice_size]
+        fiction_serializer = self.get_serializer(fiction_qs, many=True)
+
+        return Response({'Art': art_serializer.data,
+                         'Novel': novel_serializer.data,
+                         'Fiction': fiction_serializer.data})
