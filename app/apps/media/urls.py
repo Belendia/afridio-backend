@@ -19,7 +19,7 @@ router.register('tracks', views.TrackViewSet, 'tracks')
 router.register('home', views.HomeAPIView, 'home')
 
 # /medias/:media_slug/tracks
-tracks_router = routers.NestedSimpleRouter(router, r'medias', lookup='medias')
+tracks_router = routers.NestedSimpleRouter(router, r'medias', lookup='media')
 tracks_router.register(r'tracks', views.TrackNestedViewSet, basename='media_tracks')
 
 urlpatterns = [

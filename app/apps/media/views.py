@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 from apps.media.models import Genre, Track, Media
 from apps.media import serializers
@@ -176,13 +177,31 @@ class MediaViewSet(viewsets.ModelViewSet):
 # /medias/:media_slug/tracks
 class TrackNestedViewSet(viewsets.ViewSet):
     pagination_class = None
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, DjangoModelPermissionsOrAnonReadOnly)
     queryset = Track.objects.all()
+    serializer_class = serializers.TrackSerializer
 
     def list(self, request, *args, **kwargs):
-        queryset = self.queryset.filter(medias__slug=kwargs['medias_slug'])
-        serializer = serializers.TrackSerializer(queryset, many=True)
+        queryset = self.queryset.filter(medias__slug=kwargs['media_slug'])
+        serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        try:
+            # check that the slug passed in the route exists in the database
+            media = Media.objects.get(slug=kwargs['media_slug'])
+            # assign the slug to medias in the request
+            request.data['medias'] = [media.slug, ]
+            # assign the track data in the class's serializer
+            serializer = self.serializer_class(data=request.data)
+            # validate the track data
+            serializer.is_valid(raise_exception=True)
+            # save the track data
+            serializer.save(user=self.request.user)
+        except Exception as e:
+            return Response({"detail": str(e)},
+                            status=HTTP_400_BAD_REQUEST)
+        return Response(status=HTTP_201_CREATED)
 
 
 # /home
