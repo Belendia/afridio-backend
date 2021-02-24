@@ -177,9 +177,10 @@ class MediaViewSet(viewsets.ModelViewSet):
 class TrackNestedViewSet(viewsets.ViewSet):
     pagination_class = None
     permission_classes = (IsAuthenticated,)
+    queryset = Track.objects.all()
 
     def list(self, request, *args, **kwargs):
-        queryset = Track.objects.filter(medias__slug=kwargs['medias_slug'])
+        queryset = self.queryset.filter(medias__slug=kwargs['medias_slug'])
         serializer = serializers.TrackSerializer(queryset, many=True)
         return Response(serializer.data)
 
