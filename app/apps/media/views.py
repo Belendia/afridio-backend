@@ -1,6 +1,7 @@
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly
+from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly, \
+    IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
@@ -18,7 +19,7 @@ class BaseViewSet(viewsets.GenericViewSet,
     """Base viewset for media app"""
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (DjangoModelPermissionsOrAnonReadOnly, )
+    permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
     pagination_class = PageNumberPagination
     lookup_field = 'slug'
 
@@ -28,6 +29,7 @@ class BaseViewSet(viewsets.GenericViewSet,
         serializer.save(user=self.request.user)
 
 
+# /genres
 class GenreViewSet(BaseViewSet):
     """Manage genres in the database"""
 
@@ -48,6 +50,7 @@ class GenreViewSet(BaseViewSet):
     #     return queryset
 
 
+# /tracks
 class TrackViewSet(BaseViewSet):
     """Manage track in the database"""
 
@@ -94,6 +97,7 @@ class TrackViewSet(BaseViewSet):
     #     return self.queryset.filter(user=self.request.user)
 
 
+# /medias
 class MediaViewSet(viewsets.ModelViewSet):
     """Manage media in the database"""
 
@@ -121,7 +125,7 @@ class MediaViewSet(viewsets.ModelViewSet):
         return self.serializer_class
 
     @action(methods=['POST'], detail=True, url_path='image')
-    def image(self, request, slug=None, version=None,):
+    def image(self, request, slug=None, version=None, ):
         """Upload an image to an media"""
 
         media = self.get_object()
@@ -169,11 +173,23 @@ class MediaViewSet(viewsets.ModelViewSet):
         return queryset  # .filter(user=self.request.user)
 
 
+# /medias/:media_slug/tracks
+class TrackNestedViewSet(viewsets.ViewSet):
+    pagination_class = None
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request, *args, **kwargs):
+        queryset = Track.objects.filter(medias__slug=kwargs['medias_slug'])
+        serializer = serializers.TrackSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+# /home
 class HomeAPIView(viewsets.ModelViewSet):
     """Custom queryset api view. Does not implement pagination"""
 
     pagination_class = None
-    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
     slice_size = 5  # count limit for each of the source queries
     serializer_class = serializers.MediaSerializer
     queryset = Media.objects.all()
