@@ -63,7 +63,12 @@ class TracksDisplaySerializer(serializers.ModelSerializer):
 class MediaSerializer(serializers.ModelSerializer):
     """Serializer for media objects"""
 
-    genres = serializers.SerializerMethodField()
+    genre_list = serializers.SerializerMethodField()
+    genres = serializers.SlugRelatedField(
+        many=True,
+        slug_field='slug',
+        queryset=Genre.objects.all()
+    )
 
     tracks = serializers.SerializerMethodField()
 
@@ -71,12 +76,12 @@ class MediaSerializer(serializers.ModelSerializer):
         model = Media
         fields = ('title', 'price', 'discount_price', 'image', 'slug',
                   'estimated_length_in_seconds', 'rating', 'release_date',
-                  'media_format', 'word_count', 'album_type', 'authors', 'genres',
+                  'media_format', 'word_count', 'album_type', 'authors', 'genres', 'genre_list',
                   'tracks')
         read_only_fields = ('id', 'slug')
         lookup_field = 'slug'
 
-    def get_genres(self, obj):
+    def get_genre_list(self, obj):
         return GenreDisplaySerializer(obj.genres.all(), many=True).data
 
     def get_tracks(self, obj):
