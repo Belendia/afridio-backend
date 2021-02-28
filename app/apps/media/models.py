@@ -87,6 +87,7 @@ class Media(models.Model):
     price = models.DecimalField(max_digits=5, decimal_places=2)
     discount_price = models.DecimalField(null=True, blank=True, max_digits=5,
                                          decimal_places=2)
+    authors = models.CharField(max_length=255)
     image = models.ImageField(null=True, upload_to=media_image_file_path)
     slug = models.SlugField(blank=True, unique=True)
     estimated_length_in_seconds = models.PositiveIntegerField(null=True,
