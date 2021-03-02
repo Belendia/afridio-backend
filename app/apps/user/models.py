@@ -59,7 +59,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             return [(key.value, key.name) for key in cls]
 
     phone_number = models.CharField(max_length=15, validators=[phone_regex],
-                             unique=True)
+                                    unique=True)
     email = models.EmailField(max_length=255, unique=True, blank=True,
                               null=True)
     name = models.CharField(max_length=255)
