@@ -83,6 +83,7 @@ class TrackViewSet(BaseViewSet):
             if track.file_url:
                 audio = MP3(track.file_url)
                 track.duration = audio.info.length
+                track.save()
                 # encode_track.delay(track.slug, track.file_url.name)
 
             return Response(
