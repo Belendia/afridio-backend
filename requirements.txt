@@ -10,10 +10,10 @@ drf-nested-routers==0.92.5
 filetype==1.0.7
 flake8==3.8.3
 minio==6.0.2
+mutagen==1.45.1
 nexmo>=2.4.0
 Pillow==7.2.0
 psycopg2>=2.7.5,<=2.8.5
-PyJWT>=1.7.1
 python-decouple==3.3
 redis==3.5.3
 stripe==2.51.0

@@ -1,3 +1,4 @@
+from mutagen.mp3 import MP3
 from rest_framework import viewsets, mixins, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly, \
@@ -11,7 +12,7 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 from apps.media.models import Genre, Track, Media
 from apps.media import serializers
 from apps.media.tasks.resize_image_task import resize_image
-from apps.media.tasks.encode_track_task import encode_track
+# from apps.media.tasks.encode_track_task import encode_track
 
 
 class BaseViewSet(viewsets.GenericViewSet,
@@ -80,7 +81,9 @@ class TrackViewSet(BaseViewSet):
             serializer.save()
 
             if track.file_url:
-                encode_track.delay(track.slug, track.file_url.name)
+                audio = MP3(track.file_url)
+                track.duration = audio.info.length
+                # encode_track.delay(track.slug, track.file_url.name)
 
             return Response(
                 serializer.data,

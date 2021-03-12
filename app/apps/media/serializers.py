@@ -33,7 +33,7 @@ class TrackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Track
         fields = ('slug', 'name', 'popularity', 'file_url', 'sample',
-                  'duration_ms',  'medias')
+                  'duration',  'medias')
         read_only_fields = ('id', 'slug', 'file_url')
         lookup_field = 'slug'
 
@@ -54,8 +54,10 @@ class TracksDisplaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Track
         fields = (
+            'slug',
             'name',
-            'file_url'
+            'file_url',
+            'duration'
         )
         read_only_fields = ('name', 'file_url')
 
@@ -107,4 +109,3 @@ class MediaImageSerializer(serializers.ModelSerializer):
 
     def get_result(self, obj):
         return 'Processing image'
-

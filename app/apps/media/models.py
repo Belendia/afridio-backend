@@ -61,7 +61,7 @@ class Track(models.Model):
     popularity = models.PositiveIntegerField()
     # original_url = models.URLField(max_length=200)
     file_url = models.FileField(null=True, upload_to=track_file_path)
-    duration_ms = models.PositiveIntegerField()
+    duration = models.PositiveIntegerField()
     slug = models.SlugField(blank=True, unique=True)
     sample = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
