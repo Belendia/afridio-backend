@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from apps.common.utils.models import TimeStampedModel
+from apps.common.models import TimeStampedModel
 
 
 class PhoneVerification(TimeStampedModel):
