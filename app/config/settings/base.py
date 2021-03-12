@@ -151,7 +151,7 @@ COVER_IMAGE_CROP_SIZES = [(225, 300)]
 COVER_IMAGE_DIR = 'cover'
 
 # Track File
-TRACK_FILE_DIR = 'video'
+TRACK_FILE_DIR = 'audio'
 
 # Twilio
 
