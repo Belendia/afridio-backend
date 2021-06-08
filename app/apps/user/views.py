@@ -1,6 +1,11 @@
+from django.contrib.auth import logout
+
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 from rest_framework import generics, authentication, permissions
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK
 
 from apps.user.serializers import LoginSerializer, UserSerializer
 
@@ -29,3 +34,15 @@ class MeView(generics.RetrieveUpdateAPIView):
         """Retrieve and return authentication user"""
 
         return self.request.user
+
+
+class LogoutView(APIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get(self, request, *args, **kwargs):
+        request.user.auth_token.delete()
+
+        logout(request)
+
+        return Response(status=HTTP_200_OK)
