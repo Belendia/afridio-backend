@@ -4,6 +4,7 @@ from django.contrib.auth.models import Group
 from rest_framework import serializers
 from apps.phone.backends import get_sms_backend
 from apps.common.utils.phone_verification_services import send_security_code_and_generate_session_token
+from django.conf import settings
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -12,6 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'},
                                       write_only=True)
     session_token = serializers.CharField(required=False)
+    otp_expiration_time = serializers.IntegerField(required=False)
 
     class Meta:
         model = get_user_model()
@@ -23,6 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
             'date_of_birth',
             'picture',
             'session_token',
+            'otp_expiration_time',
             'password',
             'password2'
         )
@@ -76,7 +79,7 @@ class UserSerializer(serializers.ModelSerializer):
                 res = serializers.ValidationError({'detail': msg})
                 res.status_code = 500
                 raise res
-        # return {'user': user, 'session_token': session_token}
+
         attrs = {
             'email': user.email,
             'name': user.name,
@@ -84,7 +87,8 @@ class UserSerializer(serializers.ModelSerializer):
             'phone_number': user.phone_number,
             'date_of_birth': user.date_of_birth,
             'picture': user.picture,
-            'session_token': device_session_token
+            'session_token': device_session_token,
+            'otp_expiration_time': settings.PHONE_VERIFICATION.get('SECURITY_CODE_EXPIRATION_TIME', 300)
         }
         return attrs
 
