@@ -149,3 +149,14 @@ class BaseBackend(metaclass=ABCMeta):
         ).first()
 
         return stored_verification is not None
+
+    @classmethod
+    def get_session_token(cls, phone_number):
+        """
+        get security token
+        """
+        phone_verification = PhoneVerification.objects.filter(
+            phone_number=phone_number
+        ).first()
+
+        return phone_verification.session_token

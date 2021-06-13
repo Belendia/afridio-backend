@@ -41,7 +41,7 @@ class VerifyPhoneNumberAndLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': msg})
 
         backend = get_sms_backend()
-        verification, token_validatation = backend.validate_security_code(
+        verification, token_validation = backend.validate_security_code(
             security_code=security_code,
             phone_number=phone_number,
             session_token=session_token,
@@ -49,11 +49,11 @@ class VerifyPhoneNumberAndLoginSerializer(serializers.Serializer):
 
         if verification is None:
             raise serializers.ValidationError({'detail': _("Security code is not valid")})
-        elif token_validatation == backend.SESSION_TOKEN_INVALID:
+        elif token_validation == backend.SESSION_TOKEN_INVALID:
             raise serializers.ValidationError({'detail': _("Session Token mis-match")})
-        elif token_validatation == backend.SECURITY_CODE_EXPIRED:
+        elif token_validation == backend.SECURITY_CODE_EXPIRED:
             raise serializers.ValidationError({'detail': _("Security code has expired")})
-        elif token_validatation == backend.SECURITY_CODE_VERIFIED:
+        elif token_validation == backend.SECURITY_CODE_VERIFIED:
             raise serializers.ValidationError({'detail': _("Security code is already verified")})
 
         user = authenticate(

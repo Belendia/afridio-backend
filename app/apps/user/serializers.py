@@ -5,6 +5,7 @@ from rest_framework import serializers
 from apps.phone.backends import get_sms_backend
 from apps.common.utils.phone_verification_services import send_security_code_and_generate_session_token
 from django.conf import settings
+from rest_framework.exceptions import PermissionDenied
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -130,8 +131,9 @@ class LoginSerializer(serializers.Serializer):
              -      if it is expired generate another and send it
              - If not, register the phone and  
             """
+            session_token = sms_backend.get_session_token(phone_number)
             msg = _('Please verify your phone.')
-            raise serializers.ValidationError({'detail': msg})
+            raise PermissionDenied({'detail': msg, 'session_token': session_token})
 
         attrs['user'] = user
 
