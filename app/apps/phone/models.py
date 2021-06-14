@@ -13,6 +13,7 @@ class PhoneVerification(TimeStampedModel):
     security_code = models.CharField(_("Security Code"), max_length=120)
     session_token = models.CharField(_("Device Session Token"), max_length=500)
     is_verified = models.BooleanField(_("Security Code Verified"), default=False)
+    sent_at = models.DateTimeField(_("Security Code Sent At"), auto_now=True, editable=True)
 
     class Meta:
         ordering = ['-created_at', '-updated_at']

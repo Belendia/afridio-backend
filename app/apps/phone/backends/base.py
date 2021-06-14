@@ -20,6 +20,7 @@ class BaseBackend(metaclass=ABCMeta):
     SECURITY_CODE_EXPIRED = 2
     SECURITY_CODE_VERIFIED = 3
     SESSION_TOKEN_INVALID = 4
+    SESSION_CODE_WAITING_TIME_EXPIRED = 5
 
     def __init__(self, **settings):
         self.exception_class = None
@@ -60,6 +61,15 @@ class BaseBackend(metaclass=ABCMeta):
         if time_difference.seconds > django_settings.PHONE_VERIFICATION.get(
             "SECURITY_CODE_EXPIRATION_TIME"
         ):
+            return True
+        return False
+
+    @classmethod
+    def check_security_code_waiting_time_expiry(cls, number):
+        phone_verification_info = PhoneVerification.objects.filter(phone_number=number).first()
+
+        time_difference = timezone.now() - phone_verification_info.get('sent_at')
+        if time_difference.seconds > django_settings.PHONE_VERIFICATION.get('OTP_RESEND_TIME'):
             return True
         return False
 
@@ -126,6 +136,10 @@ class BaseBackend(metaclass=ABCMeta):
         # check security_code is not expired
         if self.check_security_code_expiry(stored_verification):
             return stored_verification, self.SECURITY_CODE_EXPIRED
+
+        # check security_code waiting time is expired
+        if self.check_security_code_waiting_time_expiry(phone_number):
+            return stored_verification, self.SESSION_CODE_WAITING_TIME_EXPIRED
 
         # check security_code is not verified
         if stored_verification.is_verified and django_settings.PHONE_VERIFICATION.get(

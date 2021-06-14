@@ -3,7 +3,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import Group
 from rest_framework import serializers
 from apps.phone.backends import get_sms_backend
-from apps.common.utils.phone_verification_services import send_security_code_and_generate_session_token
+from apps.common.utils.phone_verification_services import send_security_code_and_generate_session_token, \
+    get_otp_resend_time_remaining
 from django.conf import settings
 from rest_framework.exceptions import PermissionDenied
 
@@ -14,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'},
                                       write_only=True)
     session_token = serializers.CharField(required=False)
-    otp_expiration_time = serializers.IntegerField(required=False)
+    otp_resend_time = serializers.IntegerField(required=False)
 
     class Meta:
         model = get_user_model()
@@ -26,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
             'date_of_birth',
             'picture',
             'session_token',
-            'otp_expiration_time',
+            'otp_resend_time',
             'password',
             'password2'
         )
@@ -89,7 +90,7 @@ class UserSerializer(serializers.ModelSerializer):
             'date_of_birth': user.date_of_birth,
             'picture': user.picture,
             'session_token': device_session_token,
-            'otp_expiration_time': settings.PHONE_VERIFICATION.get('SECURITY_CODE_EXPIRATION_TIME', 300)
+            'otp_resend_time': settings.PHONE_VERIFICATION.get('OTP_RESEND_TIME', 300)
         }
         return attrs
 
@@ -133,7 +134,9 @@ class LoginSerializer(serializers.Serializer):
             """
             session_token = sms_backend.get_session_token(phone_number)
             msg = _('Please verify your phone.')
-            raise PermissionDenied({'detail': msg, 'session_token': session_token})
+            otp_resend_time = get_otp_resend_time_remaining(user.phone_number)
+            raise PermissionDenied({'detail': msg, 'phone_number': phone_number, 'session_token': session_token,
+                                    'otp_resend_time': otp_resend_time})
 
         attrs['user'] = user
 

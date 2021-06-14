@@ -4,8 +4,10 @@ from __future__ import absolute_import
 import logging
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.conf import settings as django_settings
 
 from apps.phone.backends import get_sms_backend
+from apps.phone.models import PhoneVerification
 
 logger = logging.getLogger(__name__)
 
@@ -80,3 +82,30 @@ def send_security_code_and_generate_session_token(phone_number, user):
             "{error}".format(phone_number=phone_number, error=exc)
         )
     return session_token
+
+
+def resend_security_code(phone_number):
+    stored_verification = PhoneVerification.objects.filter(
+        phone_number=phone_number
+    ).first()
+
+    stored_verification.sent_at = django.timezone.now()
+    stored_verification.save()
+
+    service = PhoneVerificationService(phone_number=phone_number)
+    try:
+        service.send_verification(phone_number, stored_verification.security_code)
+    except service.backend.exception_class as exc:
+        logger.error(
+            "Error in sending verification code to {phone_number}: "
+            "{error}".format(phone_number=phone_number, error=exc)
+        )
+    return stored_verification.session_token
+
+
+def get_otp_resend_time_remaining(phone_number):
+    phone_verification_info = PhoneVerification.objects.filter(phone_number=phone_number)
+    otp_resend_time = django_settings.PHONE_VERIFICATION.get('OTP_RESEND_TIME')
+    time_difference = otp_resend_time - (timezone.now() - phone_verification_info.get('sent_at'))
+
+    return 0 if time_difference < 0 else time_difference
