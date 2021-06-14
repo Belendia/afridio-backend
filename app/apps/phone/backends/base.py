@@ -98,6 +98,7 @@ class BaseBackend(metaclass=ABCMeta):
             phone_number=number,
             security_code=security_code,
             session_token=session_token,
+            sent_time=django.timezone.now(),
             user=user
         )
         return security_code, session_token
