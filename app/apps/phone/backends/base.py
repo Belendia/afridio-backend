@@ -21,6 +21,7 @@ class BaseBackend(metaclass=ABCMeta):
     SECURITY_CODE_VERIFIED = 3
     SESSION_TOKEN_INVALID = 4
     SESSION_CODE_WAITING_TIME_EXPIRED = 5
+    SEND_TIME_REMAINING = 6
 
     def __init__(self, **settings):
         self.exception_class = None
@@ -59,7 +60,7 @@ class BaseBackend(metaclass=ABCMeta):
         """
         time_difference = timezone.now() - stored_verification.created_at
         if time_difference.seconds > django_settings.PHONE_VERIFICATION.get(
-            "SECURITY_CODE_EXPIRATION_TIME"
+                "SECURITY_CODE_EXPIRATION_TIME"
         ):
             return True
         return False
@@ -67,8 +68,8 @@ class BaseBackend(metaclass=ABCMeta):
     @classmethod
     def check_security_code_waiting_time_expiry(cls, number):
         phone_verification_info = PhoneVerification.objects.filter(phone_number=number).first()
+        time_difference = timezone.now() - phone_verification_info.sent_at
 
-        time_difference = timezone.now() - phone_verification_info.get('sent_at')
         if time_difference.seconds > django_settings.PHONE_VERIFICATION.get('OTP_RESEND_TIME'):
             return True
         return False
@@ -91,16 +92,21 @@ class BaseBackend(metaclass=ABCMeta):
         session_token = self.generate_session_token(number)
 
         # Delete old security_code(s) for phone_number if already exists
-        PhoneVerification.objects.filter(phone_number=number).delete()
+        phone_verify = PhoneVerification.objects.filter(phone_number=number)
+        print(phone_verify.exists())
+        if phone_verify.exists():
+            phone_verify.delete()
 
         # Default security_code generated of 6 digits
+
         PhoneVerification.objects.create(
             phone_number=number,
             security_code=security_code,
             session_token=session_token,
-            sent_time=django.timezone.now(),
+            sent_at=timezone.now(),
             user=user
         )
+
         return security_code, session_token
 
     def validate_security_code(self, security_code, phone_number, session_token):
@@ -121,6 +127,7 @@ class BaseBackend(metaclass=ABCMeta):
             - `BaseBackend.SECURITY_CODE_EXPIRED`
             - `BaseBackend.SECURITY_CODE_VERIFIED`
             - `BaseBackend.SESSION_TOKEN_INVALID`
+            - `BaseBackend.SESSION_CODE_WAITING_TIME_EXPIRED`
         """
         stored_verification = PhoneVerification.objects.filter(
             security_code=security_code, phone_number=phone_number
@@ -144,7 +151,7 @@ class BaseBackend(metaclass=ABCMeta):
 
         # check security_code is not verified
         if stored_verification.is_verified and django_settings.PHONE_VERIFICATION.get(
-            "VERIFY_SECURITY_CODE_ONLY_ONCE"
+                "VERIFY_SECURITY_CODE_ONLY_ONCE"
         ):
             return stored_verification, self.SECURITY_CODE_VERIFIED
 
@@ -153,6 +160,45 @@ class BaseBackend(metaclass=ABCMeta):
         stored_verification.save()
 
         return stored_verification, self.SECURITY_CODE_VALID
+
+    def status_of_security_code(self, phone_number, session_token):
+        """
+        A utility method to check the status of `security_code` entered for
+        a given `phone_number` along with the `session_token` used.
+
+        :param phone_number: Phone number to be verified
+        :param session_token: Session token to identify the device
+
+        :return stored_verification: Contains the verification object
+        corresponding to the phone_number if found, else None.
+        :return status: Status for the stored_verification object.
+        Can be one of the following:
+            - `BaseBackend.SECURITY_CODE_VALID`
+            - `BaseBackend.SECURITY_CODE_EXPIRED`
+            - `BaseBackend.SESSION_TOKEN_INVALID`
+            - `BaseBackend.SESSION_CODE_WAITING_TIME_EXPIRED`
+        """
+        stored_verification = PhoneVerification.objects.filter(
+            phone_number=phone_number
+        ).first()
+
+        # check security_code exists
+        if stored_verification is None:
+            return stored_verification, self.SECURITY_CODE_INVALID
+
+        # check session code exists
+        if not stored_verification.session_token == session_token:
+            return stored_verification, self.SESSION_TOKEN_INVALID
+
+        # check security_code is not expired
+        if self.check_security_code_expiry(stored_verification):
+            return stored_verification, self.SECURITY_CODE_EXPIRED
+
+        # check security_code waiting time is expired
+        if self.check_security_code_waiting_time_expiry(phone_number):
+            return stored_verification, self.SESSION_CODE_WAITING_TIME_EXPIRED
+        else:
+            return stored_verification, self.SEND_TIME_REMAINING
 
     @classmethod
     def is_phone_number_verified(cls, phone_number):
@@ -174,4 +220,7 @@ class BaseBackend(metaclass=ABCMeta):
             phone_number=phone_number
         ).first()
 
-        return phone_verification.session_token
+        if phone_verification:
+            return phone_verification.session_token
+
+        return None

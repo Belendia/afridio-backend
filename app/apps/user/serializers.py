@@ -132,9 +132,9 @@ class LoginSerializer(serializers.Serializer):
              -      if it is expired generate another and send it
              - If not, register the phone and  
             """
-            session_token = sms_backend.get_session_token(phone_number)
+            # session_token = sms_backend.get_session_token(phone_number)
             msg = _('Please verify your phone.')
-            otp_resend_time = get_otp_resend_time_remaining(user.phone_number)
+            otp_resend_time, session_token = get_otp_resend_time_remaining(user.phone_number)
             raise PermissionDenied({'detail': msg, 'phone_number': phone_number, 'session_token': session_token,
                                     'otp_resend_time': otp_resend_time})
 

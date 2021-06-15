@@ -90,7 +90,7 @@ def resend_security_code(phone_number):
         phone_number=phone_number
     ).first()
 
-    stored_verification.sent_at = django.timezone.now()
+    stored_verification.sent_at = timezone.now()
     stored_verification.save()
 
     service = PhoneVerificationService(phone_number=phone_number)
@@ -106,7 +106,10 @@ def resend_security_code(phone_number):
 
 def get_otp_resend_time_remaining(phone_number):
     phone_verification_info = PhoneVerification.objects.filter(phone_number=phone_number).first()
-    otp_resend_time = django_settings.PHONE_VERIFICATION.get('OTP_RESEND_TIME')
-    time_difference = otp_resend_time - (timezone.now() - phone_verification_info.sent_at).seconds
-
-    return 0 if time_difference < 0 else time_difference
+    session_token = None
+    if phone_verification_info:
+        otp_resend_time = django_settings.PHONE_VERIFICATION.get('OTP_RESEND_TIME')
+        time_difference = otp_resend_time - (timezone.now() - phone_verification_info.sent_at).seconds
+        session_token = phone_verification_info.session_token
+        return 0 if time_difference < 0 else time_difference, session_token
+    return 0, session_token
