@@ -19,7 +19,7 @@ def media_image_file_path(instance, filename):
     ext = filename.split('.')[-1]
     filename = f'cover.{ext}'
 
-    return os.path.join(instance.media_format.lower(),
+    return os.path.join(instance.media_format.name.lower(),
                         settings.COVER_IMAGE_DIR, instance.slug, filename)
 
 
@@ -31,7 +31,7 @@ def track_file_path(instance, filename):
 
     folder_name = 'track'
     if instance.medias.all().count() > 0:
-        folder_name = instance.medias.all()[0].media_format.lower()
+        folder_name = instance.medias.all()[0].media_format.name.lower()
 
     return os.path.join(folder_name, settings.TRACK_FILE_DIR,
                         instance.slug, filename)
