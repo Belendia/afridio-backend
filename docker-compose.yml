@@ -31,13 +31,14 @@ services:
       - db
     restart: on-failure
   db:
-    image: postgres:9.6.21-alpine
+    image: postgres:13.3-alpine
     ports:
-      - "5435:5432"
+      - "5432:5432"
     environment:
       - POSTGRES_DB=afridio
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres123882
+      - PGDATA=/var/lib/postgresql/data/pgdata
     restart: on-failure
     volumes:
       - /Users/belendia/.postgres:/var/lib/postgresql/data
