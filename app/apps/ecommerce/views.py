@@ -24,7 +24,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 class HomeView(ListView):
 
-    queryset = Media.objects.filter(media_format='AUDIOBOOK')
+    queryset = Media.objects.filter(media_format=1)
     paginate_by = 10
     template_name = "home.html"
 
