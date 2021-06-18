@@ -123,15 +123,7 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': msg})
 
         if not sms_backend.is_phone_number_verified(phone_number):
-            """
-            TODO: 
-             - check if the phone is is registered in the PhoneVerification model
-             - if phone is registered
-             -      check if it is expired
-             -      if it is not expired resend the code
-             -      if it is expired generate another and send it
-             - If not, register the phone and  
-            """
+
             # session_token = sms_backend.get_session_token(phone_number)
             msg = _('Please verify your phone.')
             otp_resend_time, session_token = get_otp_resend_time_remaining(user.phone_number)
