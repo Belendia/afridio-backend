@@ -1,6 +1,7 @@
 import os
 from secrets import token_urlsafe
 from enum import Enum
+import random
 
 from django.db import models
 from django.conf import settings
@@ -78,6 +79,11 @@ class Track(TimeStampedModel):
 
 class Format(TimeStampedModel):
     name = models.CharField(max_length=50)
+    slug = models.SlugField(blank=True, unique=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT
+    )
 
     class Meta:
         ordering = ['-name']
@@ -88,6 +94,11 @@ class Format(TimeStampedModel):
 
 class Language(TimeStampedModel):
     name = models.CharField(max_length=50)
+    slug = models.SlugField(blank=True, unique=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT
+    )
 
     class Meta:
         ordering = ['-name']
@@ -98,6 +109,7 @@ class Language(TimeStampedModel):
 
 class Author(TimeStampedModel):
     name = models.CharField(max_length=50)
+    slug = models.SlugField(blank=True, unique=True)
     biography = models.TextField(blank=True, null=True)
 
     class Sex(Enum):
@@ -111,6 +123,10 @@ class Author(TimeStampedModel):
 
     sex = models.CharField(max_length=20, choices=Sex.choices())
     date_of_birth = models.DateField(blank=True, null=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT
+    )
 
     class Meta:
         ordering = ['-name']
@@ -199,3 +215,6 @@ def pre_save_receiver(sender, instance, *args, **kwargs):
 pre_save.connect(pre_save_receiver, sender=Genre)
 pre_save.connect(pre_save_receiver, sender=Track)
 pre_save.connect(pre_save_receiver, sender=Media)
+pre_save.connect(pre_save_receiver, sender=Author)
+pre_save.connect(pre_save_receiver, sender=Format)
+pre_save.connect(pre_save_receiver, sender=Language)
