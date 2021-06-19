@@ -122,9 +122,9 @@ class MediaViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         """Return appropriate serializer class"""
 
-        if self.action == 'retrieve':
-            return serializers.MediaDetailSerializer
-        elif self.action == 'image':
+        # if self.action == 'retrieve':
+        #     return serializers.MediaDetailSerializer
+        if self.action == 'image':
             return serializers.MediaImageSerializer
 
         return self.serializer_class
