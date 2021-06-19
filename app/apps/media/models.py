@@ -13,14 +13,13 @@ from django.dispatch import receiver
 from ..common.models import TimeStampedModel
 
 
-def media_image_file_path(instance, filename):
+def image_file_path(instance, filename):
     """Generate file path for new media cover image"""
 
     ext = filename.split('.')[-1]
     filename = f'cover.{ext}'
 
-    return os.path.join(instance.media_format.name.lower(),
-                        settings.COVER_IMAGE_DIR, instance.slug, filename)
+    return os.path.join(settings.IMAGE_DIR,instance.slug, filename)
 
 
 def track_file_path(instance, filename):
@@ -92,6 +91,32 @@ class Format(TimeStampedModel):
         return self.name
 
 
+class ImageSize(TimeStampedModel):
+    slug = models.SlugField(blank=True, unique=True)
+    width = models.PositiveIntegerField()
+    watermark = models.BooleanField()
+    logo_max_width_height_ratio = models.FloatField(default=0.06)
+    logo_top_left_ratio = models.FloatField(default=0.02)
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT
+    )
+
+
+class Image(TimeStampedModel):
+    slug = models.SlugField(blank=True, unique=True)
+    path = models.ImageField(null=True, upload_to=image_file_path)
+    size = models.ForeignKey(
+        ImageSize,
+        on_delete=models.PROTECT
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT
+    )
+
+
 class Language(TimeStampedModel):
     name = models.CharField(max_length=50)
     slug = models.SlugField(blank=True, unique=True)
@@ -123,6 +148,8 @@ class Author(TimeStampedModel):
 
     sex = models.CharField(max_length=20, choices=Sex.choices())
     date_of_birth = models.DateField(blank=True, null=True)
+
+    images = models.ManyToManyField('Image')
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT
@@ -144,8 +171,6 @@ class Media(TimeStampedModel):
     discount_price = models.DecimalField(null=True, blank=True, max_digits=5,
                                          decimal_places=2)
 
-    authors = models.ManyToManyField('Author')
-    image = models.ImageField(null=True, upload_to=media_image_file_path)
     slug = models.SlugField(blank=True, unique=True)
     estimated_length_in_seconds = models.PositiveIntegerField(null=True,
                                                               blank=True, )
@@ -180,6 +205,9 @@ class Media(TimeStampedModel):
     genres = models.ManyToManyField('Genre')
     tracks = models.ManyToManyField('Track', related_name='medias',
                                     blank=True)
+    images = models.ManyToManyField('Image')
+    authors = models.ManyToManyField('Author')
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT
@@ -218,3 +246,5 @@ pre_save.connect(pre_save_receiver, sender=Media)
 pre_save.connect(pre_save_receiver, sender=Author)
 pre_save.connect(pre_save_receiver, sender=Format)
 pre_save.connect(pre_save_receiver, sender=Language)
+pre_save.connect(pre_save_receiver, sender=ImageSize)
+pre_save.connect(pre_save_receiver, sender=Image)

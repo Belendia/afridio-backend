@@ -143,12 +143,8 @@ LOGIN_REDIRECT_URL = '/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-# Image Manipulation
-WATERMARK_COVER_IMAGE = True
-LOGO_MAX_WIDTH_HEIGHT_RATIO = 0.06
-LOGO_TOP_LEFT_RATIO = 0.02
-COVER_IMAGE_CROP_SIZES = [(225, 300)]
-COVER_IMAGE_DIR = 'cover'
+# Image manipulation
+IMAGE_DIR = 'images'
 
 # Track File
 TRACK_FILE_DIR = 'audio'
