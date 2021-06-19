@@ -92,6 +92,7 @@ class Format(TimeStampedModel):
 
 
 class ImageSize(TimeStampedModel):
+    name = models.CharField(max_length=50)
     slug = models.SlugField(blank=True, unique=True)
     width = models.PositiveIntegerField()
     watermark = models.BooleanField()
@@ -102,6 +103,12 @@ class ImageSize(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT
     )
+
+    class Meta:
+        ordering = ['-width']
+
+    def __str__(self):
+        return str(self.name)
 
 
 class Image(TimeStampedModel):
@@ -115,6 +122,9 @@ class Image(TimeStampedModel):
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT
     )
+
+    def __str__(self):
+        return self.path.url
 
 
 class Language(TimeStampedModel):
