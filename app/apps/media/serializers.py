@@ -16,7 +16,7 @@ class ImageSlugRelatedField(serializers.SlugRelatedField):
     """Serializer for author objects"""
 
     def to_representation(self, value):
-        return {'width': value.width, 'image': value.image}
+        return {'width': value.size.width, 'image': value.file.url}
 
 
 # Genre Serializers
@@ -164,17 +164,3 @@ class MediaSerializer(serializers.ModelSerializer):
 
     def get_tracks(self, obj):
         return TracksDisplaySerializer(obj.tracks.filter(sample=True), many=True).data
-
-
-class MediaImageSerializer(serializers.ModelSerializer):
-    """Serializer for uploading images to media"""
-
-    image = serializers.ImageField(validators=[validate_image_size])
-    result = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Media
-        fields = ('image', 'result')
-
-    def get_result(self, obj):
-        return 'Processing image'
