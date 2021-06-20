@@ -18,9 +18,9 @@ from apps.media.tasks.resize_image_task import resize_image
 def image_file_path(instance, filename):
     """Generate file path for new media cover image"""
 
-    filename = "{}-w{}.{}".format(token_urlsafe(6), instance.size.width, 'png')
+    filename = "{}.{}".format(token_urlsafe(6), 'png')
 
-    return os.path.join(settings.IMAGE_DIR, instance.slug, filename)
+    return os.path.join(settings.IMAGE_DIR, instance.slug, "w{}".format(instance.size.width), filename)
 
 
 def track_file_path(instance, filename):
