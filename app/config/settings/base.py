@@ -23,7 +23,7 @@ SECRET_KEY = config('SECRET_KEY')
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -44,6 +44,11 @@ INSTALLED_APPS = [
     'apps.ecommerce',
     'apps.phone',
     'apps.common',
+
+    # Admin template
+    'admin_interface',
+    'colorfield',
+    'django.contrib.admin',
 ]
 
 MIDDLEWARE = [
