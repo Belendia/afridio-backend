@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.media.models import Genre, Track, Media, Language, Format, Author
+from apps.media.models import Genre, Track, Media, Language, Format, Author, Image
 
 from apps.common.utils.validators import validate_image_size, validate_file_type
 
@@ -10,6 +10,13 @@ class SlugRelatedField(serializers.SlugRelatedField):
 
     def to_representation(self, value):
         return value.name
+
+
+class ImageSlugRelatedField(serializers.SlugRelatedField):
+    """Serializer for author objects"""
+
+    def to_representation(self, value):
+        return {'width': value.width, 'image': value.image}
 
 
 # Genre Serializers
@@ -145,12 +152,13 @@ class MediaSerializer(serializers.ModelSerializer):
     )
 
     authors = SlugRelatedField(many=True, slug_field='slug', queryset=Author.objects.all())
+    images = ImageSlugRelatedField(many=True, slug_field='slug', queryset=Image.objects.all())
 
     class Meta:
         model = Media
-        fields = ('title', 'price', 'discount_price', 'image', 'slug',
-                  'estimated_length_in_seconds', 'rating', 'release_date', 'language', 'media_format',
-                  'word_count', 'album_type', 'genres', 'tracks', 'authors')
+        fields = ('title', 'price', 'discount_price', 'slug', 'estimated_length_in_seconds',
+                  'rating', 'release_date', 'language', 'media_format', 'word_count',
+                  'album_type', 'genres', 'tracks', 'authors', 'images',)
         read_only_fields = ('id', 'slug')
         lookup_field = 'slug'
 

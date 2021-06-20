@@ -5,21 +5,22 @@ import random
 
 from django.db import models
 from django.conf import settings
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.utils.translation import ugettext_lazy as _
 from django.utils.text import slugify
 from django.shortcuts import reverse
 from django.dispatch import receiver
+
 from ..common.models import TimeStampedModel
+from apps.media.tasks.resize_image_task import resize_image
 
 
 def image_file_path(instance, filename):
     """Generate file path for new media cover image"""
 
-    ext = filename.split('.')[-1]
-    filename = f'cover.{ext}'
+    filename = "{}-w{}.{}".format(token_urlsafe(6), instance.size.width, 'png')
 
-    return os.path.join(settings.IMAGE_DIR,instance.slug, filename)
+    return os.path.join(settings.IMAGE_DIR, instance.slug, filename)
 
 
 def track_file_path(instance, filename):
@@ -113,7 +114,7 @@ class ImageSize(TimeStampedModel):
 
 class Image(TimeStampedModel):
     slug = models.SlugField(blank=True, unique=True)
-    path = models.ImageField(null=True, upload_to=image_file_path)
+    file = models.ImageField(null=True, upload_to=image_file_path)
     size = models.ForeignKey(
         ImageSize,
         on_delete=models.PROTECT
@@ -124,7 +125,7 @@ class Image(TimeStampedModel):
     )
 
     def __str__(self):
-        return self.path.url
+        return self.file.url
 
 
 class Language(TimeStampedModel):
@@ -250,6 +251,13 @@ def pre_save_receiver(sender, instance, *args, **kwargs):
         instance.slug = slugify(token_urlsafe(16))
 
 
+# resize image when user uploads it using admin interface
+def post_save_receiver(sender, instance, *args, **kwargs):
+    if instance.file:
+        resize_image.delay(instance.file.name, instance.size.watermark, instance.size.logo_max_width_height_ratio,
+                           instance.size.logo_top_left_ratio, instance.size.width)
+
+
 pre_save.connect(pre_save_receiver, sender=Genre)
 pre_save.connect(pre_save_receiver, sender=Track)
 pre_save.connect(pre_save_receiver, sender=Media)
@@ -258,3 +266,5 @@ pre_save.connect(pre_save_receiver, sender=Format)
 pre_save.connect(pre_save_receiver, sender=Language)
 pre_save.connect(pre_save_receiver, sender=ImageSize)
 pre_save.connect(pre_save_receiver, sender=Image)
+
+post_save.connect(post_save_receiver, sender=Image)

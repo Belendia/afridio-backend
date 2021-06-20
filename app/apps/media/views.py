@@ -11,7 +11,6 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 from apps.media.models import Genre, Track, Media
 from apps.media import serializers
-from apps.media.tasks.resize_image_task import resize_image
 # from apps.media.tasks.encode_track_task import encode_track
 
 
@@ -119,41 +118,41 @@ class MediaViewSet(viewsets.ModelViewSet):
 
         serializer.save(user=self.request.user)
 
-    def get_serializer_class(self):
-        """Return appropriate serializer class"""
+    # def get_serializer_class(self):
+    #     """Return appropriate serializer class"""
+    #
+    #     # if self.action == 'retrieve':
+    #     #     return serializers.MediaDetailSerializer
+    #     if self.action == 'image':
+    #         return serializers.MediaImageSerializer
+    #
+    #     return self.serializer_class
 
-        # if self.action == 'retrieve':
-        #     return serializers.MediaDetailSerializer
-        if self.action == 'image':
-            return serializers.MediaImageSerializer
-
-        return self.serializer_class
-
-    @action(methods=['POST'], detail=True, url_path='image')
-    def image(self, request, slug=None, version=None, ):
-        """Upload an image to an media"""
-
-        media = self.get_object()
-        serializer = self.get_serializer(
-            media,
-            data=request.data
-        )
-
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-
-            if media.image:
-                resize_image.delay(media.slug, media.image.name)
-
-            return Response(
-                serializer.data,
-                status=status.HTTP_200_OK
-            )
-
-        return Response(
-            serializer.errors,
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    # @action(methods=['POST'], detail=True, url_path='image')
+    # def image(self, request, slug=None, version=None, ):
+    #     """Upload an image to an media"""
+    #
+    #     media = self.get_object()
+    #     serializer = self.get_serializer(
+    #         media,
+    #         data=request.data
+    #     )
+    #
+    #     if serializer.is_valid(raise_exception=True):
+    #         serializer.save()
+    #
+    #         if media.image:
+    #             resize_image.delay(media.slug, media.image.name)
+    #
+    #         return Response(
+    #             serializer.data,
+    #             status=status.HTTP_200_OK
+    #         )
+    #
+    #     return Response(
+    #         serializer.errors,
+    #         status=status.HTTP_400_BAD_REQUEST
+    #     )
 
     def _params_to_slugs(self, qs):
         """Convert a list of string IDs to a list of integers"""
