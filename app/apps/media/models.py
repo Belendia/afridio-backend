@@ -13,6 +13,7 @@ from django.dispatch import receiver
 
 from ..common.models import TimeStampedModel
 from apps.media.tasks.resize_image_task import resize_image
+from apps.common.utils.validators import validate_image_size, validate_file_type
 
 
 def image_file_path(instance, filename):
@@ -27,14 +28,9 @@ def track_file_path(instance, filename):
     """Generate file path for new track file"""
 
     ext = filename.split('.')[-1]
-    filename = f'track.{ext}'
+    filename = "{}.{}".format(instance.slug, ext)
 
-    folder_name = 'track'
-    if instance.medias.all().count() > 0:
-        folder_name = instance.medias.all()[0].media_format.name.lower()
-
-    return os.path.join(folder_name, settings.TRACK_FILE_DIR,
-                        instance.slug, filename)
+    return os.path.join(settings.TRACK_FILE_DIR, filename)
 
 
 class Genre(TimeStampedModel):
@@ -60,10 +56,11 @@ class Track(TimeStampedModel):
     name = models.CharField(max_length=255)
     popularity = models.PositiveIntegerField()
     # original_url = models.URLField(max_length=200)
-    file_url = models.FileField(null=True, upload_to=track_file_path)
+    file_url = models.FileField(null=True, upload_to=track_file_path, validators=[validate_file_type])
     duration = models.PositiveIntegerField()
     slug = models.SlugField(blank=True, unique=True)
     sample = models.BooleanField(default=False)
+    sequence = models.PositiveIntegerField()
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -71,7 +68,7 @@ class Track(TimeStampedModel):
     )
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['-sequence', '-id']
 
     def __str__(self):
         return self.name
@@ -114,7 +111,7 @@ class ImageSize(TimeStampedModel):
 
 class Image(TimeStampedModel):
     slug = models.SlugField(blank=True, unique=True)
-    file = models.ImageField(null=True, upload_to=image_file_path)
+    file = models.ImageField(null=True, upload_to=image_file_path, validators=[validate_image_size])
     size = models.ForeignKey(
         ImageSize,
         on_delete=models.PROTECT

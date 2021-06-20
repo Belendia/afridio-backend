@@ -19,6 +19,13 @@ class ImageSlugRelatedField(serializers.SlugRelatedField):
         return {'width': value.size.width, 'image': value.file.url}
 
 
+class MediaSlugRelatedField(serializers.SlugRelatedField):
+    """Serializer for author objects"""
+
+    def to_representation(self, value):
+        return value.title
+
+
 # Genre Serializers
 class GenreSerializer(serializers.ModelSerializer):
     """Serializer for genre objects"""
@@ -89,7 +96,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 class TrackSerializer(serializers.ModelSerializer):
     """Serializer for track objects"""
 
-    medias = serializers.SlugRelatedField(
+    medias = MediaSlugRelatedField(
         many=True,
         slug_field='slug',
         queryset=Media.objects.all()
@@ -97,7 +104,7 @@ class TrackSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Track
-        fields = ('slug', 'name', 'popularity', 'file_url', 'sample',
+        fields = ('slug', 'name', 'popularity', 'file_url', 'sample', 'sequence',
                   'duration', 'medias')
         read_only_fields = ('id', 'slug', 'file_url')
         lookup_field = 'slug'
@@ -122,7 +129,8 @@ class TracksDisplaySerializer(serializers.ModelSerializer):
             'slug',
             'name',
             'file_url',
-            'duration'
+            'duration',
+            'sequence'
         )
         read_only_fields = ('name', 'file_url')
 
