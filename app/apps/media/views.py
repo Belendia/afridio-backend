@@ -8,7 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
-from apps.media.models import Genre, Track, Media
+from apps.media.models import Genre, Track, Media, Format
 from apps.media import serializers
 # from apps.media.tasks.encode_track_task import encode_track
 
@@ -207,19 +207,31 @@ class HomeAPIView(viewsets.ModelViewSet):
     pagination_class = None
     permission_classes = (IsAuthenticated,)
     slice_size = 5  # count limit for each of the source queries
+
     serializer_class = serializers.MediaSerializer
     queryset = Media.objects.all()
 
     def list(self, request, *args, **kwargs):
-        art_qs = self.get_queryset().filter(genres__name__in=["Art"])[:self.slice_size]
-        art_serializer = self.get_serializer(art_qs, many=True)
+        home_response = {}
+        # genre_qs = Genre.objects.all()
+        # for genre in genre_qs:
+        #     qs = self.get_queryset().filter(genres__name__in=[genre.name])[:self.slice_size]
+        #     if qs.count():
+        #         serializer = self.get_serializer(qs, many=True)
+        #         home_response[genre.name] = serializer.data
 
-        novel_qs = self.get_queryset().filter(genres__name__in=["Novel"])[:self.slice_size]
-        novel_serializer = self.get_serializer(novel_qs, many=True)
+        # Featured media
+        qs = self.get_queryset().filter(featured=True)
+        if qs.count():
+            serializer = self.get_serializer(qs, many=True)
+            home_response["Featured"] = serializer.data
 
-        fiction_qs = self.get_queryset().filter(genres__name__in=["Fiction"])[:self.slice_size]
-        fiction_serializer = self.get_serializer(fiction_qs, many=True)
+        # Media by format
+        format_qs = Format.objects.all()
+        for format in format_qs:
+            qs = self.get_queryset().filter(media_format=format.id).order_by('-created_at')[:self.slice_size]
+            if qs.count():
+                serializer = self.get_serializer(qs, many=True)
+                home_response[format.name] = serializer.data
 
-        return Response({'Art': art_serializer.data,
-                         'Novel': novel_serializer.data,
-                         'Fiction': fiction_serializer.data})
+        return Response(home_response)
