@@ -5,11 +5,21 @@ from apps.media import models
 admin.site.register(models.Genre)
 admin.site.register(models.Language)
 admin.site.register(models.Format)
-admin.site.register(models.Image)
 admin.site.register(models.ImageSize)
 
 
+class ImageAdmin(admin.ModelAdmin):
+    list_display = ("name", "created_at")
+    search_fields = ("name",)
+
+
+admin.site.register(models.Image, ImageAdmin)
+
+
 class TrackAdmin(admin.ModelAdmin):
+    list_display = ("name", "sample", "created_at")
+    search_fields = ("name",)
+    list_filter = ("duration", "popularity", "sample")
     filter_horizontal = ('medias', )
 
 

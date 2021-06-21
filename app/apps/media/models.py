@@ -86,6 +86,7 @@ class ImageSize(TimeStampedModel):
 
 
 class Image(TimeStampedModel):
+    name = models.CharField(max_length=100)
     slug = models.SlugField(blank=True, unique=True)
     file = models.ImageField(null=True, upload_to=image_file_path, validators=[validate_image_size])
     size = models.ForeignKey(
@@ -98,7 +99,7 @@ class Image(TimeStampedModel):
     )
 
     def __str__(self):
-        return self.file.url
+        return "{} - ({})".format(self.name, self.file.url)
 
 
 class Language(TimeStampedModel):
