@@ -19,7 +19,7 @@ admin.site.register(models.Image, ImageAdmin)
 class TrackAdmin(admin.ModelAdmin):
     list_display = ("name", "sample", "created_at")
     search_fields = ("name",)
-    list_filter = ("duration", "popularity", "sample")
+    list_filter = ("duration", "medias", "popularity", "sample")
     filter_horizontal = ('medias', )
 
 
@@ -28,7 +28,7 @@ admin.site.register(models.Track, TrackAdmin)
 
 class MediaAdmin(admin.ModelAdmin):
     list_display = ("title", "language", "featured", "release_date", "created_at")
-    list_filter = ("featured", "language", "release_date")
+    list_filter = ("authors", "featured", "genres", "language", "release_date")
     search_fields = ("title",)
     filter_horizontal = ('authors', 'genres', 'images', 'tracks')
 
