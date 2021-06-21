@@ -224,13 +224,13 @@ class HomeAPIView(viewsets.ModelViewSet):
         #         home_response[genre.name] = serializer.data
 
         # Featured media
-        qs = self.get_queryset().filter(featured=True).order_by('-sequence')[:self.featured_size]
+        qs = self.get_queryset().filter(featured=True).order_by('-created_at')[:self.featured_size]
         if qs.count():
             serializer = self.get_serializer(qs, many=True)
             home_response["Featured"] = serializer.data
 
         # Media by format
-        format_qs = Format.objects.all()
+        format_qs = Format.objects.all().order_by('sequence')
         for format in format_qs:
             qs = self.get_queryset().filter(media_format=format.id).order_by('-created_at')[:self.slice_size]
             if qs.count():
