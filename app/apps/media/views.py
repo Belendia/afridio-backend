@@ -10,6 +10,8 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 from apps.media.models import Genre, Track, Media, Format
 from apps.media import serializers
+
+
 # from apps.media.tasks.encode_track_task import encode_track
 
 
@@ -207,6 +209,7 @@ class HomeAPIView(viewsets.ModelViewSet):
     pagination_class = None
     permission_classes = (IsAuthenticated,)
     slice_size = 5  # count limit for each of the source queries
+    featured_size = 5  # count limit for featured medias
 
     serializer_class = serializers.MediaSerializer
     queryset = Media.objects.all()
@@ -221,7 +224,7 @@ class HomeAPIView(viewsets.ModelViewSet):
         #         home_response[genre.name] = serializer.data
 
         # Featured media
-        qs = self.get_queryset().filter(featured=True)
+        qs = self.get_queryset().filter(featured=True).order_by('-sequence')[:self.featured_size]
         if qs.count():
             serializer = self.get_serializer(qs, many=True)
             home_response["Featured"] = serializer.data

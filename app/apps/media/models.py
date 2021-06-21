@@ -53,13 +53,14 @@ class Genre(TimeStampedModel):
 class Format(TimeStampedModel):
     name = models.CharField(max_length=50)
     slug = models.SlugField(blank=True, unique=True)
+    sequence = models.PositiveIntegerField()
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT
     )
 
     class Meta:
-        ordering = ['-name']
+        ordering = ['-sequence']
 
     def __str__(self):
         return self.name

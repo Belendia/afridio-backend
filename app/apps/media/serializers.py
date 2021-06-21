@@ -76,7 +76,7 @@ class FormatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Format
-        fields = ('name',)
+        fields = ('name', 'sequence')
         read_only_fields = ('id',)
         lookup_field = 'slug'
 
