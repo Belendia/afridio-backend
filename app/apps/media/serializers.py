@@ -165,7 +165,7 @@ class MediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Media
         fields = ('title', 'price', 'discount_price', 'slug', 'estimated_length_in_seconds',
-                  'rating', 'release_date', 'language', 'media_format', 'word_count',
+                  'rating', 'release_date', 'language', 'media_format', 'word_count', 'featured',
                   'album_type', 'genres', 'tracks', 'authors', 'images',)
         read_only_fields = ('id', 'slug')
         lookup_field = 'slug'

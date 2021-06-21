@@ -50,30 +50,6 @@ class Genre(TimeStampedModel):
         return self.name
 
 
-class Track(TimeStampedModel):
-    """Track to be used for a media books and music"""
-
-    name = models.CharField(max_length=255)
-    popularity = models.PositiveIntegerField()
-    # original_url = models.URLField(max_length=200)
-    file_url = models.FileField(null=True, upload_to=track_file_path, validators=[validate_file_type])
-    duration = models.PositiveIntegerField()
-    slug = models.SlugField(blank=True, unique=True)
-    sample = models.BooleanField(default=False)
-    sequence = models.PositiveIntegerField()
-
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.PROTECT
-    )
-
-    class Meta:
-        ordering = ['-sequence', '-id']
-
-    def __str__(self):
-        return self.name
-
-
 class Format(TimeStampedModel):
     name = models.CharField(max_length=50)
     slug = models.SlugField(blank=True, unique=True)
@@ -185,9 +161,7 @@ class Media(TimeStampedModel):
     rating = models.PositiveIntegerField(null=True, blank=True)
     release_date = models.DateField(null=True)
     description = models.TextField()
-
-    media_format = models.ForeignKey(Format, on_delete=models.PROTECT)
-    language = models.ForeignKey(Language, on_delete=models.PROTECT)
+    featured = models.BooleanField(default=False)
 
     # Audiobook
     word_count = models.PositiveIntegerField(null=True)
@@ -210,12 +184,12 @@ class Media(TimeStampedModel):
     )
 
     # Relationships
+    media_format = models.ForeignKey(Format, on_delete=models.PROTECT)
+    language = models.ForeignKey(Language, on_delete=models.PROTECT)
     genres = models.ManyToManyField('Genre')
-    tracks = models.ManyToManyField('Track', related_name='medias',
-                                    blank=True)
+    tracks = models.ManyToManyField('Track', blank=True)
     images = models.ManyToManyField('Image')
     authors = models.ManyToManyField('Author')
-
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT
@@ -241,6 +215,31 @@ class Media(TimeStampedModel):
         return reverse('ecommerce:remove-from-cart', kwargs={
             'slug': self.slug
         })
+
+
+class Track(TimeStampedModel):
+    """Track to be used for a media books and music"""
+
+    name = models.CharField(max_length=255)
+    popularity = models.PositiveIntegerField()
+    # original_url = models.URLField(max_length=200)
+    file_url = models.FileField(null=True, upload_to=track_file_path, validators=[validate_file_type])
+    duration = models.PositiveIntegerField()
+    slug = models.SlugField(blank=True, unique=True)
+    sample = models.BooleanField(default=False)
+    sequence = models.PositiveIntegerField()
+
+    medias = models.ManyToManyField(Media, through=Media.tracks.through, blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT
+    )
+
+    class Meta:
+        ordering = ['-sequence', '-id']
+
+    def __str__(self):
+        return self.name
 
 
 def pre_save_receiver(sender, instance, *args, **kwargs):
