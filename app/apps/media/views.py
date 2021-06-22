@@ -215,26 +215,47 @@ class HomeAPIView(viewsets.ModelViewSet):
     queryset = Media.objects.all()
 
     def list(self, request, *args, **kwargs):
-        home_response = {}
-        # genre_qs = Genre.objects.all()
-        # for genre in genre_qs:
-        #     qs = self.get_queryset().filter(genres__name__in=[genre.name])[:self.slice_size]
+        # home_response = {}
+        # # genre_qs = Genre.objects.all()
+        # # for genre in genre_qs:
+        # #     qs = self.get_queryset().filter(genres__name__in=[genre.name])[:self.slice_size]
+        # #     if qs.count():
+        # #         serializer = self.get_serializer(qs, many=True)
+        # #         home_response[genre.name] = serializer.data
+        #
+        # # Featured media
+        # qs = self.get_queryset().filter(featured=True).order_by('-created_at')[:self.featured_size]
+        # if qs.count():
+        #     serializer = self.get_serializer(qs, many=True)
+        #     home_response["Featured"] = serializer.data
+        #
+        # # Media by format
+        # format_qs = Format.objects.all().order_by('sequence')
+        # for format in format_qs:
+        #     qs = self.get_queryset().filter(media_format=format.id).order_by('-created_at')[:self.slice_size]
         #     if qs.count():
         #         serializer = self.get_serializer(qs, many=True)
-        #         home_response[genre.name] = serializer.data
+        #         home_response[format.name] = serializer.data
+
+        home_response = []
 
         # Featured media
+        f = {'id': 'featured', 'title': 'Featured'}
         qs = self.get_queryset().filter(featured=True).order_by('-created_at')[:self.featured_size]
         if qs.count():
             serializer = self.get_serializer(qs, many=True)
-            home_response["Featured"] = serializer.data
+            f["medias"] = serializer.data
+        home_response.append(f)
 
         # Media by format
         format_qs = Format.objects.all().order_by('sequence')
         for format in format_qs:
+
             qs = self.get_queryset().filter(media_format=format.id).order_by('-created_at')[:self.slice_size]
             if qs.count():
+                f = {'id': format.slug, 'title': format.name}
                 serializer = self.get_serializer(qs, many=True)
-                home_response[format.name] = serializer.data
+                f["medias"] = serializer.data
+                home_response.append(f)
 
         return Response(home_response)
