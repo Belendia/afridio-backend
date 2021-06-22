@@ -48,6 +48,7 @@ class AuthorAdmin(admin.ModelAdmin):
     list_display = ("name", "sex", "created_at")
     list_filter = ("sex",)
     search_fields = ("name",)
+    filter_horizontal = ('images',)
 
 
 admin.site.register(models.Author, AuthorAdmin)
