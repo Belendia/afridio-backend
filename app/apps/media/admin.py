@@ -5,7 +5,15 @@ from apps.media import models
 admin.site.register(models.Genre)
 admin.site.register(models.Language)
 admin.site.register(models.Format)
-admin.site.register(models.ImageSize)
+
+
+class ImageSizeAdmin(admin.ModelAdmin):
+    list_display = ("name", "width", "watermark", "created_at")
+    list_filter = ("watermark", )
+    search_fields = ("name", "width")
+
+
+admin.site.register(models.ImageSize, ImageSizeAdmin)
 
 
 class ImageAdmin(admin.ModelAdmin):
