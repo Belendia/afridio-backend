@@ -100,7 +100,7 @@ class Image(TimeStampedModel):
     )
 
     def __str__(self):
-        return "{} - ({})".format(self.name, self.file.url)
+        return "{} - ({})".format(self.name, self.size)
 
 
 class Language(TimeStampedModel):

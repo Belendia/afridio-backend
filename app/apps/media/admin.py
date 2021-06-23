@@ -17,7 +17,8 @@ admin.site.register(models.ImageSize, ImageSizeAdmin)
 
 
 class ImageAdmin(admin.ModelAdmin):
-    list_display = ("name", "created_at")
+    list_display = ("name", "size", "created_at")
+    list_filter = ("size",)
     search_fields = ("name",)
 
 
