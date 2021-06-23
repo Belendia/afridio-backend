@@ -26,7 +26,7 @@ admin.site.register(models.Image, ImageAdmin)
 
 
 class TrackAdmin(admin.ModelAdmin):
-    list_display = ("name", "sample", "created_at")
+    list_display = ("name", "sequence", "sample", "created_at")
     search_fields = ("name",)
     list_filter = ("duration", "medias", "popularity", "sample")
     filter_horizontal = ('medias', )
