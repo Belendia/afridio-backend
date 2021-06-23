@@ -1,4 +1,5 @@
 from rest_framework import serializers
+import json
 
 from apps.media.models import Genre, Track, Media, Language, Format, Author, Image
 
@@ -16,7 +17,7 @@ class ImageSlugRelatedField(serializers.SlugRelatedField):
     """Serializer for author objects"""
 
     def to_representation(self, value):
-        return {'width': value.size.width, 'image': value.file.url}
+        return {'slug': value.slug, 'width': value.size.width, 'image': value.file.url}
 
 
 class MediaSlugRelatedField(serializers.SlugRelatedField):
@@ -24,6 +25,14 @@ class MediaSlugRelatedField(serializers.SlugRelatedField):
 
     def to_representation(self, value):
         return value.title
+
+
+class AuthorSlugRelatedField(serializers.SlugRelatedField):
+    """Serializer for author objects"""
+
+    def to_representation(self, value):
+        serializer = ImageSerializer(value.images, many=True)
+        return {"name": value.name, "slug": value.slug, "photo": serializer.data}
 
 
 # Genre Serializers
@@ -88,6 +97,17 @@ class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
         fields = ('name', 'sex', 'date_of_birth', 'biography')
+        read_only_fields = ('id',)
+        lookup_field = 'slug'
+
+
+# Image Serializers
+class ImageSerializer(serializers.ModelSerializer):
+    """Serializer for language objects"""
+
+    class Meta:
+        model = Image
+        fields = ('slug', 'file')
         read_only_fields = ('id',)
         lookup_field = 'slug'
 
@@ -159,7 +179,7 @@ class MediaSerializer(serializers.ModelSerializer):
         queryset=Format.objects.all()
     )
 
-    authors = SlugRelatedField(many=True, slug_field='slug', queryset=Author.objects.all())
+    authors = AuthorSlugRelatedField(many=True, slug_field='slug', queryset=Author.objects.all())
     images = ImageSlugRelatedField(many=True, slug_field='slug', queryset=Image.objects.all())
 
     class Meta:
@@ -171,4 +191,5 @@ class MediaSerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
 
     def get_tracks(self, obj):
-        return TracksDisplaySerializer(obj.tracks.filter(sample=True), many=True).data
+        # return TracksDisplaySerializer(obj.tracks.filter(sample=True), many=True).data
+        return TracksDisplaySerializer(obj.tracks.all().order_by('sequence'), many=True).data
