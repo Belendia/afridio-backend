@@ -189,6 +189,7 @@ class MediaSerializer(serializers.ModelSerializer):
 
     authors = AuthorSlugRelatedField(many=True, slug_field='slug', queryset=Author.objects.all())
     images = ImageSlugRelatedField(many=True, slug_field='slug', queryset=Image.objects.all())
+    release_date = serializers.SerializerMethodField()
 
     class Meta:
         model = Media
@@ -201,3 +202,8 @@ class MediaSerializer(serializers.ModelSerializer):
     def get_tracks(self, obj):
         # return TracksDisplaySerializer(obj.tracks.filter(sample=True), many=True).data
         return TracksDisplaySerializer(obj.tracks.all().order_by('sequence'), many=True).data
+
+    def get_release_date(self, obj):
+        if obj.release_date:
+            return obj.release_date.strftime("%d/%m/%Y")
+        return ""
