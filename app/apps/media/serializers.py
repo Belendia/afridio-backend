@@ -1,5 +1,5 @@
 from rest_framework import serializers
-import json
+import datetime
 
 from apps.media.models import Genre, Track, Media, Language, Format, Author, Image
 
@@ -143,6 +143,8 @@ class TrackFileSerializer(serializers.ModelSerializer):
 
 
 class TracksDisplaySerializer(serializers.ModelSerializer):
+    duration = serializers.SerializerMethodField()
+
     class Meta:
         model = Track
         fields = (
@@ -153,6 +155,12 @@ class TracksDisplaySerializer(serializers.ModelSerializer):
             'sequence'
         )
         read_only_fields = ('name', 'file_url')
+
+    def get_duration(self, obj):
+        delta = datetime.timedelta(seconds=0)
+        if obj.duration:
+            delta = datetime.timedelta(seconds=obj.duration)
+        return str(delta)
 
 
 # Media serializer
