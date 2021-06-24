@@ -148,6 +148,33 @@ class Author(TimeStampedModel):
         return self.name
 
 
+class Narrator(TimeStampedModel):
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(blank=True, unique=True)
+
+    class Sex(Enum):
+        MALE = "MALE"
+        FEMALE = "FEMALE"
+        UNSURE = "UNSURE"
+
+        @classmethod
+        def choices(cls):
+            return [(key.value, key.name) for key in cls]
+
+    sex = models.CharField(max_length=20, choices=Sex.choices())
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT
+    )
+
+    class Meta:
+        ordering = ['-name']
+
+    def __str__(self):
+        return self.name
+
+
 class Media(TimeStampedModel):
     """Common model for Album and Audiobook"""
 
@@ -192,6 +219,7 @@ class Media(TimeStampedModel):
     tracks = models.ManyToManyField('Track', blank=True)
     images = models.ManyToManyField('Image')
     authors = models.ManyToManyField('Author')
+    narrators = models.ManyToManyField('Narrator')
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT
@@ -264,5 +292,6 @@ pre_save.connect(pre_save_receiver, sender=Format)
 pre_save.connect(pre_save_receiver, sender=Language)
 pre_save.connect(pre_save_receiver, sender=ImageSize)
 pre_save.connect(pre_save_receiver, sender=Image)
+pre_save.connect(pre_save_receiver, sender=Narrator)
 
 post_save.connect(post_save_receiver, sender=Image)

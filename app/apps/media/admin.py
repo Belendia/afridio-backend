@@ -37,9 +37,9 @@ admin.site.register(models.Track, TrackAdmin)
 
 class MediaAdmin(admin.ModelAdmin):
     list_display = ("title", "language", "featured", "release_date", "created_at")
-    list_filter = ("authors", "featured", "genres", "language", "media_format", "release_date")
+    list_filter = ("authors", "featured", "genres", "language", "media_format", "narrators", "release_date")
     search_fields = ("title",)
-    filter_horizontal = ('authors', 'genres', 'images', 'tracks')
+    filter_horizontal = ('authors', 'genres', 'images', 'tracks', 'narrators')
 
 
 admin.site.register(models.Media, MediaAdmin)
@@ -53,3 +53,12 @@ class AuthorAdmin(admin.ModelAdmin):
 
 
 admin.site.register(models.Author, AuthorAdmin)
+
+
+class NarratorAdmin(admin.ModelAdmin):
+    list_display = ("name", "sex", "created_at")
+    list_filter = ("sex",)
+    search_fields = ("name",)
+
+
+admin.site.register(models.Narrator, NarratorAdmin)

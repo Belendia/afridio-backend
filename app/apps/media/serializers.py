@@ -1,7 +1,7 @@
 from rest_framework import serializers
 import datetime
 
-from apps.media.models import Genre, Track, Media, Language, Format, Author, Image
+from apps.media.models import Genre, Track, Media, Language, Format, Author, Image, Narrator
 
 from apps.common.utils.validators import validate_image_size, validate_file_type
 
@@ -188,6 +188,11 @@ class MediaSerializer(serializers.ModelSerializer):
     )
 
     authors = AuthorSlugRelatedField(many=True, slug_field='slug', queryset=Author.objects.all())
+    narrators = SlugRelatedField(
+        many=True,
+        slug_field='slug',
+        queryset=Narrator.objects.all()
+    )
     images = ImageSlugRelatedField(many=True, slug_field='slug', queryset=Image.objects.all())
     release_date = serializers.SerializerMethodField()
 
@@ -195,7 +200,7 @@ class MediaSerializer(serializers.ModelSerializer):
         model = Media
         fields = ('title', 'price', 'discount_price', 'slug', 'description', 'estimated_length_in_seconds',
                   'rating', 'release_date', 'language', 'media_format', 'word_count', 'featured',
-                  'album_type', 'genres', 'tracks', 'authors', 'images',)
+                  'album_type', 'genres', 'tracks', 'authors', 'narrators', 'images',)
         read_only_fields = ('id', 'slug')
         lookup_field = 'slug'
 
