@@ -156,9 +156,9 @@ class MediaViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Retrieves the media for the current authenticated user"""
-
         genres = self.request.query_params.get('genres')
         tracks = self.request.query_params.get('tracks')
+        category = self.request.query_params.get('category')
         queryset = self.queryset
 
         if genres:
@@ -168,6 +168,9 @@ class MediaViewSet(viewsets.ModelViewSet):
         if tracks:
             track_slugs = self._params_to_slugs(tracks)
             queryset = queryset.filter(tracks__slug__in=track_slugs)
+
+        if category:
+            queryset = queryset.filter(media_format__slug=category)
 
         return queryset  # .filter(user=self.request.user)
 
