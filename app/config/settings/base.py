@@ -152,7 +152,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 IMAGE_DIR = 'images'
 
 # Track File
-TRACK_FILE_DIR = 'video'
+TRACK_FILE_DIR = 'audio'
 
 # Twilio
 
