@@ -29,7 +29,7 @@ def validate_file_type(temp_file):
             _("Can't determine file type.")
         )
     file_type = kind.mime
-    allowed_types = ['video/mp4']  # ['audio/mpeg', 'audio/ogg', 'video/mp4']
+    allowed_types = ['audio/mpeg', 'audio/ogg']  # 'video/mp4'
     if file_type not in allowed_types:
         raise ValidationError(
             _('File type should be MP4: [Current file type: {}]'
