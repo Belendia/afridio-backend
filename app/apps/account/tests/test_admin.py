@@ -21,14 +21,14 @@ class AdminSiteTest(TestCase):
         self.user = get_user_model().objects.create_user(
             email='test@habeltech.com',
             password='password123',
-            name='Test user full name',
+            name='Test account full name',
             sex='FEMALE',
             date_of_birth=date.today(),
             phone='+251911000000'
         )
 
     def test_users_listed(self):
-        """Test that users are listed on user page"""
+        """Test that users are listed on account page"""
 
         url = reverse('admin:core_user_changelist')
         response = self.client.get(url)
@@ -37,16 +37,16 @@ class AdminSiteTest(TestCase):
         self.assertContains(response, self.user.email)
 
     def test_user_change_page(self):
-        """Test that the user edit page works"""
+        """Test that the account edit page works"""
 
-        # /admin/core/user/1
+        # /admin/core/account/1
         url = reverse('admin:core_user_change', args=[self.user.id])
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
 
     def test_create_user_page(self):
-        """Test that the create user page works"""
+        """Test that the create account page works"""
 
         url = reverse('admin:core_user_add')
         response = self.client.get(url)

@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'crispy_forms',
 
     # Local apps
-    'apps.user',
+    'apps.account',
     'apps.media',
     'apps.ecommerce',
     'apps.phone',
@@ -128,7 +128,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 
-AUTH_USER_MODEL = 'user.User'
+AUTH_USER_MODEL = 'account.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

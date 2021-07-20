@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 import logging
 
-from apps.user.models import User
+from apps.account.models import User
 from .serializers import VerifyPhoneNumberAndLoginSerializer
 from apps.phone.backends import get_sms_backend
 from apps.common.utils.phone_verification_services import send_security_code_and_generate_session_token, \
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 class VerifyPhoneNumberANDLoginViewSet(ObtainAuthToken):
-    """Create a new auth token for user"""
+    """Create a new auth token for account"""
 
     serializer_class = VerifyPhoneNumberAndLoginSerializer
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
@@ -34,10 +34,10 @@ class ResendOTPView(APIView):
         try:
             user = User.objects.get(phone_number=phone_number)
             if not user.check_password(password):
-                msg = _("Unable to authenticate the user")
+                msg = _("Unable to authenticate the account")
                 return Response({'detail': msg}, status=HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
-            msg = _("Unable to authenticate the user")
+            msg = _("Unable to authenticate the account")
             return Response({'detail': msg}, status=HTTP_400_BAD_REQUEST)
 
         user = authenticate(

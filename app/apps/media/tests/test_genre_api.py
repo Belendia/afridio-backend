@@ -28,7 +28,7 @@ class PublicGenreApiTests(TestCase):
 
 
 class PrivateGenreApiTest(TestCase):
-    """Test the authorized user genre API"""
+    """Test the authorized account genre API"""
 
     def setUp(self):
         self.user = get_user_model().objects.create_superuser(

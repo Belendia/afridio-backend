@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 class UserManager(BaseUserManager):
 
     def create_user(self, phone_number, password=None, **kwargs):
-        """Creates and saves a new user"""
+        """Creates and saves a new account"""
 
         if not phone_number:
             raise ValueError('Users must have phone number')
@@ -42,7 +42,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """Custom user model that supports using email instead of username"""
+    """Custom account model that supports using email instead of username"""
 
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,14}$',
                                  message="Phone number must be entered in the "

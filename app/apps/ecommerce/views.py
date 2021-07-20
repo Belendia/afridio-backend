@@ -342,7 +342,7 @@ class PaymentView(View):
                 return redirect("/")
 
             except stripe.error.StripeError:
-                # Display a very generic error to the user, and maybe send
+                # Display a very generic error to the account, and maybe send
                 # yourself an email
                 messages.warning(
                     self.request, "Something went wrong. You were not "

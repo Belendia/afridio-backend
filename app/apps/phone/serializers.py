@@ -4,7 +4,7 @@ from rest_framework import serializers
 import logging
 
 from .models import PhoneVerification
-from apps.user.models import User
+from apps.account.models import User
 from apps.phone.backends import get_sms_backend
 
 logger = logging.getLogger(__name__)
@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class VerifyPhoneNumberAndLoginSerializer(serializers.Serializer):
     """
-    Serializer for the phone number verification and user authentication
+    Serializer for the phone number verification and account authentication
     """
 
     phone_number = serializers.CharField()
@@ -24,7 +24,7 @@ class VerifyPhoneNumberAndLoginSerializer(serializers.Serializer):
     security_code = serializers.CharField(required=True)
 
     def validate(self, attrs):
-        """Validate and authenticate the user"""
+        """Validate and authenticate the account"""
         attrs = super().validate(attrs)
 
         phone_number = attrs.get('phone_number')
@@ -37,10 +37,10 @@ class VerifyPhoneNumberAndLoginSerializer(serializers.Serializer):
         try:
             user = User.objects.get(phone_number=phone_number)
             if not user.check_password(password):
-                msg = _("Unable to authenticate the user")
+                msg = _("Unable to authenticate the account")
                 raise serializers.ValidationError({'detail': msg})
         except User.DoesNotExist:
-            msg = _("Unable to authenticate the user")
+            msg = _("Unable to authenticate the account")
             raise serializers.ValidationError({'detail': msg})
 
         backend = get_sms_backend()
@@ -69,7 +69,7 @@ class VerifyPhoneNumberAndLoginSerializer(serializers.Serializer):
             msg = _('Unable to authenticate with provided credentials')
             raise serializers.ValidationError({'detail': msg})
 
-        attrs['user'] = user
+        attrs['account'] = user
 
         logger.info('Login success: ', attrs)
 

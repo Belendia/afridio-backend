@@ -91,9 +91,9 @@ class TrackViewSet(BaseViewSet):
         )
 
     # def get_queryset(self):
-    #     """Return objects for the current authenticated user"""
+    #     """Return objects for the current authenticated account"""
     #
-    #     return self.queryset.filter(user=self.request.user)
+    #     return self.queryset.filter(account=self.request.account)
 
 
 # /medias
@@ -155,7 +155,7 @@ class MediaViewSet(viewsets.ModelViewSet):
         return [str_id for str_id in qs.split(',')]
 
     def get_queryset(self):
-        """Retrieves the media for the current authenticated user"""
+        """Retrieves the media for the current authenticated account"""
         genres = self.request.query_params.get('genres')
         tracks = self.request.query_params.get('tracks')
         category = self.request.query_params.get('category')
@@ -174,7 +174,7 @@ class MediaViewSet(viewsets.ModelViewSet):
         if category:
             queryset = queryset.filter(media_format__slug=category)
 
-        return queryset  # .filter(user=self.request.user)
+        return queryset  # .filter(account=self.request.account)
 
 
 # /medias/:media_slug/tracks

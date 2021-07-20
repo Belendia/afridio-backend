@@ -20,7 +20,7 @@ from django.conf import settings
 
 urlpatterns = [
     re_path(r'api/(?P<version>[v1]+)/', include('apps.media.urls')),
-    re_path(r'api/(?P<version>[v1]+)/', include('apps.user.urls')),
+    re_path(r'api/(?P<version>[v1]+)/', include('apps.account.urls')),
     re_path(r'api/(?P<version>[v1]+)/', include('apps.phone.urls')),
     path('admin/', admin.site.urls),
     path('', include('apps.ecommerce.urls')),

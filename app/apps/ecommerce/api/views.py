@@ -173,7 +173,7 @@ class CheckoutView(APIView):
                             status=HTTP_400_BAD_REQUEST)
 
         except stripe.error.StripeError:
-            # Display a very generic error to the user, and maybe send
+            # Display a very generic error to the account, and maybe send
             # yourself an email
             return Response({"detail": "Something went wrong. You were not "
                                        "charged. Please try again."},

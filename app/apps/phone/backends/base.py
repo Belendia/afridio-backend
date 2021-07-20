@@ -78,13 +78,13 @@ class BaseBackend(metaclass=ABCMeta):
         """
         Creates a temporary `security_code` and `session_token` inside the DB.
 
-        `security_code` is the code that user would enter to verify their phone_number.
+        `security_code` is the code that account would enter to verify their phone_number.
         `session_token` is used to verify if the subsequent call for verification is
         by the same device that initiated a phone number verification in the
         first place.
 
         :param number: Phone number of recipient
-        :param user: user object of recipient
+        :param user: account object of recipient
         :return security_code: string of sha security_code
         :return session_token: string of session_token
         """
