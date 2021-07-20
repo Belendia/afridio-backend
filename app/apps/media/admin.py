@@ -36,8 +36,8 @@ admin.site.register(models.Track, TrackAdmin)
 
 
 class MediaAdmin(admin.ModelAdmin):
-    list_display = ("title", "language", "featured", "release_date", "created_at")
-    list_filter = ("authors", "featured", "genres", "language", "media_format", "narrators", "release_date")
+    list_display = ("title", "language", "status", "featured", "release_date", "created_at")
+    list_filter = ("authors", "featured", "genres", "language", "media_format", "narrators", "status", "release_date")
     search_fields = ("title",)
     filter_horizontal = ('authors', 'genres', 'images', 'tracks', 'narrators')
 

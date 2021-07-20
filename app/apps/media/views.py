@@ -100,7 +100,7 @@ class TrackViewSet(BaseViewSet):
 class MediaViewSet(viewsets.ModelViewSet):
     """Manage media in the database"""
 
-    queryset = Media.objects.all()
+    queryset = Media.objects.filter(status=Media.StatusType.UNPUBLISHED)
     serializer_class = serializers.MediaSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
@@ -160,7 +160,9 @@ class MediaViewSet(viewsets.ModelViewSet):
         tracks = self.request.query_params.get('tracks')
         category = self.request.query_params.get('category')
         queryset = self.queryset
-
+        print('========================================')
+        print(Media.StatusType.UNPUBLISHED)
+        print('========================================')
         if genres:
             genre_slugs = self._params_to_slugs(genres)
             queryset = queryset.filter(genres__slug__in=genre_slugs)

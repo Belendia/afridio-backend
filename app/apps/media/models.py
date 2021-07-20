@@ -212,6 +212,24 @@ class Media(TimeStampedModel):
         blank=True
     )
 
+    # Status
+    class StatusType(Enum):
+        UNPUBLISHED = "UNPUBLISHED"
+        PUBLISHED = "PUBLISHED"
+        ARCHIVED = "ARCHIVED"
+        TRASHED = "TRASHED"
+
+        @classmethod
+        def choices(cls):
+            return [(key.value, key.name) for key in cls]
+
+    status = models.CharField(
+        max_length=15,
+        choices=StatusType.choices(),
+        null=True,
+        blank=True
+    )
+
     # Relationships
     media_format = models.ForeignKey(Format, on_delete=models.PROTECT)
     language = models.ForeignKey(Language, on_delete=models.PROTECT)
@@ -246,6 +264,8 @@ class Media(TimeStampedModel):
             'slug': self.slug
         })
 
+    def get_status_type(self):
+        return StatusType(self.status).name.title()
 
 class Track(TimeStampedModel):
     """Track to be used for a media books and music"""
