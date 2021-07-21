@@ -172,3 +172,6 @@ PHONE_VERIFICATION = {
     # If False, then a security code can be used multiple times for verification
     "OTP_RESEND_TIME": 300,  # 5 minutes
 }
+
+# django admin interface
+X_FRAME_OPTIONS = 'SAMEORIGIN'

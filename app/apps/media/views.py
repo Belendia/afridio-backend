@@ -100,7 +100,7 @@ class TrackViewSet(BaseViewSet):
 class MediaViewSet(viewsets.ModelViewSet):
     """Manage media in the database"""
 
-    queryset = Media.objects.filter(status=Media.StatusType.UNPUBLISHED)
+    queryset = Media.objects.filter(status=Media.StatusType.PUBLISHED)
     serializer_class = serializers.MediaSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
@@ -160,9 +160,7 @@ class MediaViewSet(viewsets.ModelViewSet):
         tracks = self.request.query_params.get('tracks')
         category = self.request.query_params.get('category')
         queryset = self.queryset
-        print('========================================')
-        print(Media.StatusType.UNPUBLISHED)
-        print('========================================')
+
         if genres:
             genre_slugs = self._params_to_slugs(genres)
             queryset = queryset.filter(genres__slug__in=genre_slugs)
@@ -246,7 +244,7 @@ class HomeAPIView(viewsets.ModelViewSet):
 
         # Featured media
         f = {'id': 'featured', 'title': 'Featured'}
-        qs = self.get_queryset().filter(featured=True).order_by('-created_at')[:self.featured_size]
+        qs = self.get_queryset().filter(featured=True, status=Media.StatusType.PUBLISHED).order_by('-created_at')[:self.featured_size]
         if qs.count():
             serializer = self.get_serializer(qs, many=True)
             f["medias"] = serializer.data
@@ -256,7 +254,7 @@ class HomeAPIView(viewsets.ModelViewSet):
         format_qs = Format.objects.all().order_by('sequence')
         for format in format_qs:
 
-            qs = self.get_queryset().filter(media_format=format.id).order_by('-created_at')[:self.slice_size]
+            qs = self.get_queryset().filter(media_format=format.id, status=Media.StatusType.PUBLISHED).order_by('-created_at')[:self.slice_size]
             if qs.count():
                 f = {'id': format.slug, 'title': format.name}
                 serializer = self.get_serializer(qs, many=True)

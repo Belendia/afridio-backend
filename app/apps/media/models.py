@@ -196,38 +196,29 @@ class Media(TimeStampedModel):
     word_count = models.PositiveIntegerField(null=True)
 
     # Album
-    class AlbumType(Enum):
+    class AlbumType(models.TextChoices):
         ALBUM = "ALBUM"
         SINGLE = "SINGLE"
         COMPILATION = "COMPILATION"
 
-        @classmethod
-        def choices(cls):
-            return [(key.value, key.name) for key in cls]
-
     album_type = models.CharField(
         max_length=20,
-        choices=AlbumType.choices(),
+        choices=AlbumType.choices,
         null=True,
         blank=True
     )
 
     # Status
-    class StatusType(Enum):
+    class StatusType(models.TextChoices):
         UNPUBLISHED = "UNPUBLISHED"
         PUBLISHED = "PUBLISHED"
         ARCHIVED = "ARCHIVED"
         TRASHED = "TRASHED"
 
-        @classmethod
-        def choices(cls):
-            return [(key.value, key.name) for key in cls]
-
     status = models.CharField(
         max_length=15,
-        choices=StatusType.choices(),
-        null=True,
-        blank=True
+        choices=StatusType.choices,
+        default=StatusType.UNPUBLISHED
     )
 
     # Relationships
@@ -266,6 +257,7 @@ class Media(TimeStampedModel):
 
     def get_status_type(self):
         return StatusType(self.status).name.title()
+
 
 class Track(TimeStampedModel):
     """Track to be used for a media books and music"""
