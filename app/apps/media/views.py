@@ -206,7 +206,7 @@ class TrackNestedViewSet(viewsets.ViewSet):
 
 
 # /home
-class HomeAPIView(viewsets.ModelViewSet):
+class HomeAPIView(viewsets.ViewSet):
     """Custom queryset api view. Does not implement pagination"""
 
     pagination_class = None
@@ -214,39 +214,15 @@ class HomeAPIView(viewsets.ModelViewSet):
     slice_size = 5  # count limit for each of the source queries
     featured_size = 5  # count limit for featured medias
 
-    serializer_class = serializers.MediaSerializer
-    queryset = Media.objects.all()
-
     def list(self, request, *args, **kwargs):
-        # home_response = {}
-        # # genre_qs = Genre.objects.all()
-        # # for genre in genre_qs:
-        # #     qs = self.get_queryset().filter(genres__name__in=[genre.name])[:self.slice_size]
-        # #     if qs.count():
-        # #         serializer = self.get_serializer(qs, many=True)
-        # #         home_response[genre.name] = serializer.data
-        #
-        # # Featured media
-        # qs = self.get_queryset().filter(featured=True).order_by('-created_at')[:self.featured_size]
-        # if qs.count():
-        #     serializer = self.get_serializer(qs, many=True)
-        #     home_response["Featured"] = serializer.data
-        #
-        # # Media by format
-        # format_qs = Format.objects.all().order_by('sequence')
-        # for format in format_qs:
-        #     qs = self.get_queryset().filter(media_format=format.id).order_by('-created_at')[:self.slice_size]
-        #     if qs.count():
-        #         serializer = self.get_serializer(qs, many=True)
-        #         home_response[format.name] = serializer.data
-
+        queryset = Media.objects.all()
         home_response = []
 
         # Featured media
         f = {'id': 'featured', 'title': 'Featured'}
-        qs = self.get_queryset().filter(featured=True, status=Media.StatusType.PUBLISHED).order_by('-created_at')[:self.featured_size]
+        qs = queryset.filter(featured=True, status=Media.StatusType.PUBLISHED).order_by('-created_at')[:self.featured_size]
         if qs.count():
-            serializer = self.get_serializer(qs, many=True)
+            serializer = serializers.MediaSerializer(qs, many=True)
             f["medias"] = serializer.data
         home_response.append(f)
 
@@ -254,10 +230,10 @@ class HomeAPIView(viewsets.ModelViewSet):
         format_qs = Format.objects.all().order_by('sequence')
         for format in format_qs:
 
-            qs = self.get_queryset().filter(media_format=format.id, status=Media.StatusType.PUBLISHED).order_by('-created_at')[:self.slice_size]
+            qs = queryset.filter(media_format=format.id, status=Media.StatusType.PUBLISHED).order_by('-created_at')[:self.slice_size]
             if qs.count():
                 f = {'id': format.slug, 'title': format.name}
-                serializer = self.get_serializer(qs, many=True)
+                serializer = serializers.MediaSerializer(qs, many=True)
                 f["medias"] = serializer.data
                 home_response.append(f)
 
