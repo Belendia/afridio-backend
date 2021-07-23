@@ -8,7 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
-from apps.media.models import Genre, Track, Media, Format
+from apps.media.models import Genre, Track, Media, Format, Language
 from apps.media import serializers
 
 
@@ -238,3 +238,31 @@ class HomeAPIView(viewsets.ViewSet):
                 home_response.append(f)
 
         return Response(home_response)
+
+
+# /searchby
+class SearchByAPIView(viewsets.ViewSet):
+    """Custom queryset api view. Does not implement pagination"""
+
+    pagination_class = None
+    permission_classes = (IsAuthenticated,)
+
+    def list(self, request, *args, **kwargs):
+        response = {}
+
+        language_qs = Language.objects.all().order_by('name')
+        if language_qs.count():
+            serializer = serializers.LanguageSerializer(language_qs, many=True)
+            response["languages"] = serializer.data
+
+        format_qs = Format.objects.all().order_by('sequence')
+        if format_qs.count():
+            serializer = serializers.FormatSerializer(format_qs, many=True)
+            response["format"] = serializer.data
+
+        genre_qs = Genre.objects.all().order_by('name')
+        if genre_qs.count():
+            serializer = serializers.GenreSerializer(genre_qs, many=True)
+            response["genre"] = serializer.data
+
+        return Response(response)

@@ -17,6 +17,8 @@ router.register('medias', views.MediaViewSet, 'medias')
 router.register('tracks', views.TrackViewSet, 'tracks')
 # /home
 router.register('home', views.HomeAPIView, 'home')
+# /searchby
+router.register('searchby', views.SearchByAPIView, 'searchby')
 
 # /medias/:media_slug/tracks
 tracks_router = routers.NestedSimpleRouter(router, r'medias', lookup='media')
