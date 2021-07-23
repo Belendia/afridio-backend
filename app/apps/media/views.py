@@ -258,11 +258,11 @@ class SearchByAPIView(viewsets.ViewSet):
         format_qs = Format.objects.all().order_by('sequence')
         if format_qs.count():
             serializer = serializers.FormatSerializer(format_qs, many=True)
-            response["format"] = serializer.data
+            response["formats"] = serializer.data
 
         genre_qs = Genre.objects.all().order_by('name')
         if genre_qs.count():
             serializer = serializers.GenreSerializer(genre_qs, many=True)
-            response["genre"] = serializer.data
+            response["genres"] = serializer.data
 
         return Response(response)
