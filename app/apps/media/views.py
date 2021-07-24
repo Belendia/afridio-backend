@@ -105,7 +105,7 @@ class MediaViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
     filter_backends = (SearchFilter, OrderingFilter)
-    search_fields = ['title']
+    search_fields = ['title', 'authors__name']
     lookup_field = 'slug'
 
     def perform_create(self, serializer):
