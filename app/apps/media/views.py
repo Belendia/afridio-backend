@@ -157,20 +157,24 @@ class MediaViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Retrieves the media for the current authenticated account"""
         genres = self.request.query_params.get('genres')
-        tracks = self.request.query_params.get('tracks')
+        # tracks = self.request.query_params.get('tracks')
         category = self.request.query_params.get('category')
+        lang = self.request.query_params.get('language')
         queryset = self.queryset
 
         if genres:
             genre_slugs = self._params_to_slugs(genres)
             queryset = queryset.filter(genres__slug__in=genre_slugs)
 
-        if tracks:
-            track_slugs = self._params_to_slugs(tracks)
-            queryset = queryset.filter(tracks__slug__in=track_slugs)
+        # if tracks:
+        #     track_slugs = self._params_to_slugs(tracks)
+        #     queryset = queryset.filter(tracks__slug__in=track_slugs)
 
         if category:
             queryset = queryset.filter(media_format__slug=category)
+
+        if lang:
+            queryset = queryset.filter(language__slug=lang)
 
         return queryset  # .filter(account=self.request.account)
 
