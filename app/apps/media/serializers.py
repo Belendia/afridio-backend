@@ -52,9 +52,9 @@ class LanguageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Language
-        fields = ('name',)
-        read_only_fields = ('id',)
-        lookup_field = 'id'
+        fields = ('name', 'slug')
+        read_only_fields = ('id', 'slug')
+        lookup_field = 'slug'
 
 
 # class LanguageDisplayField(serializers.RelatedField):
@@ -85,7 +85,7 @@ class FormatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Format
-        fields = ('name', 'sequence')
+        fields = ('name', 'sequence', 'slug')
         read_only_fields = ('id',)
         lookup_field = 'slug'
 
