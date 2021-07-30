@@ -284,6 +284,28 @@ class Track(TimeStampedModel):
         return self.name
 
 
+class TrackDownload(TimeStampedModel):
+    """Logs the download and removal of a track"""
+    track = models.ForeignKey(
+        'track',
+        on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT
+    )
+
+    # Status
+    class StatusType(models.TextChoices):
+        DOWNLOADED = "DOWNLOADED"
+        REMOVED = "REMOVED"
+
+    status = models.CharField(
+        max_length=15,
+        choices=StatusType.choices
+    )
+
+
 def pre_save_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = slugify(token_urlsafe(16))

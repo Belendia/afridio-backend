@@ -24,7 +24,12 @@ router.register('searchby', views.SearchByAPIView, 'searchby')
 tracks_router = routers.NestedSimpleRouter(router, r'medias', lookup='media')
 tracks_router.register(r'tracks', views.TrackNestedViewSet, basename='media_tracks')
 
+# /tracks/:track_slug/download
+download_router = routers.NestedSimpleRouter(router, r'tracks', lookup='track')
+download_router.register(r'download', views.TrackDownloadNestedViewSet, basename='track_download')
+
 urlpatterns = [
     path('', include(router.urls)),
     path('', include(tracks_router.urls)),
+    path('', include(download_router.urls)),
 ]

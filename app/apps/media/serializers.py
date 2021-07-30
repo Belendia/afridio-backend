@@ -1,7 +1,7 @@
 from rest_framework import serializers
 import datetime
 
-from apps.media.models import Genre, Track, Media, Language, Format, Author, Image, Narrator
+from apps.media.models import Genre, Track, Media, Language, Format, Author, Image, Narrator, TrackDownload
 
 from apps.common.utils.validators import validate_image_size, validate_file_type
 
@@ -161,6 +161,22 @@ class TracksDisplaySerializer(serializers.ModelSerializer):
         if obj.duration:
             delta = datetime.timedelta(seconds=obj.duration)
         return str(delta)
+
+
+# Track Download serializers
+class TrackDownloadSerializer(serializers.ModelSerializer):
+    """Serializer for track objects"""
+
+    track = serializers.SlugRelatedField(
+        many=False,
+        slug_field='slug',
+        queryset=Track.objects.all()
+    )
+
+    class Meta:
+        model = TrackDownload
+        fields = ('track', 'status', 'created_at')
+        read_only_fields = ('id',)
 
 
 # Media serializer

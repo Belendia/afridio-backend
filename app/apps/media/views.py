@@ -8,7 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
-from apps.media.models import Genre, Track, Media, Format, Language
+from apps.media.models import Genre, Track, Media, Format, Language, TrackDownload
 from apps.media import serializers
 
 
@@ -197,6 +197,36 @@ class TrackNestedViewSet(viewsets.ViewSet):
             media = Media.objects.get(slug=kwargs['media_slug'])
             # assign the slug to medias in the request
             request.data['medias'] = [media.slug, ]
+            # assign the track data in the class's serializer
+            serializer = self.serializer_class(data=request.data)
+            # validate the track data
+            serializer.is_valid(raise_exception=True)
+            # save the track data
+            serializer.save(user=self.request.user)
+        except Exception as e:
+            return Response({"detail": str(e)},
+                            status=HTTP_400_BAD_REQUEST)
+        return Response(status=HTTP_201_CREATED)
+
+
+# /tracks/:track_slug/downloads
+class TrackDownloadNestedViewSet(viewsets.ViewSet):
+    pagination_class = None
+    permission_classes = (IsAuthenticated, DjangoModelPermissionsOrAnonReadOnly)
+    queryset = TrackDownload.objects.all()
+    serializer_class = serializers.TrackDownloadSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.queryset.filter(track__slug=kwargs['track_slug'])
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        try:
+            # check that the slug passed in the route exists in the database
+            track = Track.objects.get(slug=kwargs['track_slug'])
+            # assign the slug to track in the request
+            request.data['track'] = track.slug
             # assign the track data in the class's serializer
             serializer = self.serializer_class(data=request.data)
             # validate the track data
