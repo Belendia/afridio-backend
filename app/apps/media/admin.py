@@ -62,3 +62,12 @@ class NarratorAdmin(admin.ModelAdmin):
 
 
 admin.site.register(models.Narrator, NarratorAdmin)
+
+
+class TrackDownloadAdmin(admin.ModelAdmin):
+    list_display = ("track", "user", "status", "created_at")
+    list_filter = ("track", "user", "status")
+    search_fields = ("track__name",)
+
+
+admin.site.register(models.TrackDownload, TrackDownloadAdmin)
