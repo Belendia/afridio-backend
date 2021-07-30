@@ -283,6 +283,12 @@ class Track(TimeStampedModel):
     def __str__(self):
         return self.name
 
+    def is_downloaded(self, user):
+        td = self.trackdownload_set.filter(user=user).order_by('-created_at')
+        if td.exists() and td.count() > 0:
+            return td[0].status == 'DOWNLOADED'
+        return False
+
 
 class TrackDownload(TimeStampedModel):
     """Logs the download and removal of a track"""

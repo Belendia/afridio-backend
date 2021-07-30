@@ -20,8 +20,7 @@ class BaseViewSet(viewsets.GenericViewSet,
                   mixins.CreateModelMixin):
     """Base viewset for media app"""
 
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
+    permission_classes = (IsAuthenticated, DjangoModelPermissionsOrAnonReadOnly)
     pagination_class = PageNumberPagination
     lookup_field = 'slug'
 
@@ -102,8 +101,7 @@ class MediaViewSet(viewsets.ModelViewSet):
 
     queryset = Media.objects.filter(status=Media.StatusType.PUBLISHED)
     serializer_class = serializers.MediaSerializer
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
+    permission_classes = (IsAuthenticated, DjangoModelPermissionsOrAnonReadOnly)
     filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ['title', 'authors__name']
     lookup_field = 'slug'
@@ -217,7 +215,7 @@ class TrackDownloadNestedViewSet(viewsets.ViewSet):
     serializer_class = serializers.TrackDownloadSerializer
 
     def list(self, request, *args, **kwargs):
-        queryset = self.queryset.filter(track__slug=kwargs['track_slug'])
+        queryset = self.queryset.filter(track__slug=kwargs['track_slug'], user=self.request.user)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
 

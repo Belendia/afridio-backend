@@ -1,6 +1,6 @@
-from rest_framework import serializers
 import datetime
-
+from rest_framework import serializers
+from rest_framework.fields import CurrentUserDefault
 from apps.media.models import Genre, Track, Media, Language, Format, Author, Image, Narrator, TrackDownload
 
 from apps.common.utils.validators import validate_image_size, validate_file_type
@@ -144,6 +144,7 @@ class TrackFileSerializer(serializers.ModelSerializer):
 
 class TracksDisplaySerializer(serializers.ModelSerializer):
     duration = serializers.SerializerMethodField()
+    downloaded = serializers.SerializerMethodField()
 
     class Meta:
         model = Track
@@ -152,7 +153,8 @@ class TracksDisplaySerializer(serializers.ModelSerializer):
             'name',
             'file_url',
             'duration',
-            'sequence'
+            'sequence',
+            'downloaded'
         )
         read_only_fields = ('name', 'file_url')
 
@@ -161,6 +163,13 @@ class TracksDisplaySerializer(serializers.ModelSerializer):
         if obj.duration:
             delta = datetime.timedelta(seconds=obj.duration)
         return str(delta)
+
+    def get_downloaded(self, obj):
+        user = None
+        request = self.context.get('request', None)
+        if request:
+            user = request.user
+        return obj.is_downloaded(user)
 
 
 # Track Download serializers
@@ -221,8 +230,9 @@ class MediaSerializer(serializers.ModelSerializer):
         lookup_field = 'slug'
 
     def get_tracks(self, obj):
-        # return TracksDisplaySerializer(obj.tracks.filter(sample=True), many=True).data
-        return TracksDisplaySerializer(obj.tracks.all().order_by('sequence'), many=True).data
+        return TracksDisplaySerializer(obj.tracks.all().order_by('sequence'), many=True, context={
+            'request': self.context.get('request', None)
+        }).data
 
     def get_release_date(self, obj):
         if obj.release_date:
