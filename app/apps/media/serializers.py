@@ -1,7 +1,8 @@
 import datetime
 from rest_framework import serializers
 from rest_framework.fields import CurrentUserDefault
-from apps.media.models import Genre, Track, Media, Language, Format, Author, Image, Narrator, TrackDownload
+from apps.media.models import Genre, Track, Media, Language, Format, Author, Image, \
+    Narrator, TrackDownload, MediaLike
 
 from apps.common.utils.validators import validate_image_size, validate_file_type
 
@@ -238,3 +239,13 @@ class MediaSerializer(serializers.ModelSerializer):
         if obj.release_date:
             return obj.release_date.strftime("%d/%m/%Y")
         return ""
+
+
+# MediaLike serializers
+class MediaLikeSerializer(serializers.ModelSerializer):
+    """Serializer for media like objects"""
+
+    class Meta:
+        model = MediaLike
+        fields = ('liked', 'created_at')
+        read_only_fields = ('id',)

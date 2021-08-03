@@ -71,3 +71,13 @@ class TrackDownloadAdmin(admin.ModelAdmin):
 
 
 admin.site.register(models.TrackDownload, TrackDownloadAdmin)
+
+
+class MediaLikeAdmin(admin.ModelAdmin):
+    list_display = ("media", "user", "liked", "created_at")
+    list_filter = ("media", "user", "liked")
+    search_fields = ("media__name",)
+
+
+admin.site.register(models.MediaLike, MediaLikeAdmin)
+

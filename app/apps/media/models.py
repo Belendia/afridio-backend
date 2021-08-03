@@ -311,6 +311,25 @@ class TrackDownload(TimeStampedModel):
         choices=StatusType.choices
     )
 
+    def __str__(self):
+        return "{} - {} - {}".format(self.user.name, self.track.name, self.status)
+
+
+class MediaLike(TimeStampedModel):
+    """Logs the likes of a media"""
+    media = models.ForeignKey(
+        'media',
+        on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT
+    )
+    liked = models.BooleanField(default=True)
+
+    def __str__(self):
+        return "{} - {} - {}".format(self.user.name, self.media.title, self.liked)
+
 
 def pre_save_receiver(sender, instance, *args, **kwargs):
     if not instance.slug:

@@ -8,7 +8,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
-from apps.media.models import Genre, Track, Media, Format, Language, TrackDownload
+from apps.media.models import Genre, Track, Media, Format, Language, TrackDownload, MediaLike
 from apps.media import serializers
 
 
@@ -210,7 +210,7 @@ class TrackNestedViewSet(viewsets.ViewSet):
 # /tracks/:track_slug/downloads
 class TrackDownloadNestedViewSet(viewsets.ViewSet):
     pagination_class = None
-    permission_classes = (IsAuthenticated, DjangoModelPermissionsOrAnonReadOnly)
+    permission_classes = (IsAuthenticated,)
     queryset = TrackDownload.objects.all()
     serializer_class = serializers.TrackDownloadSerializer
 
@@ -252,7 +252,8 @@ class HomeAPIView(viewsets.ViewSet):
 
         # Featured media
         f = {'id': 'featured', 'title': 'Featured'}
-        qs = queryset.filter(featured=True, status=Media.StatusType.PUBLISHED).order_by('-created_at')[:self.featured_size]
+        qs = queryset.filter(featured=True,
+                             status=Media.StatusType.PUBLISHED).order_by('-created_at')[:self.featured_size]
         if qs.count():
             serializer = serializers.MediaSerializer(qs, many=True)
             f["medias"] = serializer.data
@@ -262,7 +263,8 @@ class HomeAPIView(viewsets.ViewSet):
         format_qs = Format.objects.all().order_by('sequence')
         for format in format_qs:
 
-            qs = queryset.filter(media_format=format.id, status=Media.StatusType.PUBLISHED).order_by('-created_at')[:self.slice_size]
+            qs = queryset.filter(media_format=format.id,
+                                 status=Media.StatusType.PUBLISHED).order_by('-created_at')[:self.slice_size]
             if qs.count():
                 f = {'id': format.slug, 'title': format.name}
                 serializer = serializers.MediaSerializer(qs, many=True)
@@ -298,3 +300,40 @@ class SearchByAPIView(viewsets.ViewSet):
             response["genres"] = serializer.data
 
         return Response(response)
+
+
+# /medias/:media_slug/like
+class MediaLikeNestedViewSet(viewsets.ViewSet):
+    pagination_class = None
+    permission_classes = (IsAuthenticated, )
+    queryset = MediaLike.objects.all()
+    serializer_class = serializers.MediaLikeSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.queryset.filter(media__slug=kwargs['media_slug'], user=self.request.user)
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        try:
+            print("create")
+            # check that the slug passed in the route exists in the database
+            media = Media.objects.get(slug=kwargs['media_slug'])
+            # assign the slug to media in the request
+            request.data['media'] = media.slug
+
+            # Search the Like model which have the specified media and user, if it doesn't exist, create it
+            media_like, created = MediaLike.objects.get_or_create(media=media, user=self.request.user)
+
+            # If we passing the media_like instance to the serializer class during initialization, it will
+            # update the media like when we call the save method on the serializer object.
+            serializer = self.serializer_class(media_like, data=request.data)
+            # validate the track data
+            serializer.is_valid(raise_exception=True)
+            # save the track data
+            serializer.save(user=self.request.user)
+
+        except Exception as e:
+            return Response({"detail": str(e)},
+                            status=HTTP_400_BAD_REQUEST)
+        return Response(status=HTTP_201_CREATED)
