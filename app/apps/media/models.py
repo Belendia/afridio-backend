@@ -264,7 +264,14 @@ class Media(TimeStampedModel):
         return False
 
     def get_rating(self):
-        return self.medialike_set.filter(liked=True).count()
+        rating = self.medialike_set.filter(liked=True).count()
+        if rating >= 1000000000:
+            rating = "%.0f%s" % (rating / 1000000000.00, 'B')
+        elif rating >= 1000000:
+            rating = "%.0f%s" % (rating / 1000000.00, 'M')
+        elif rating >= 1000:
+            rating = "%.0f%s" % (rating / 1000.0, 'K')
+        return str(rating)
 
 
 class Track(TimeStampedModel):
