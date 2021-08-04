@@ -332,8 +332,8 @@ class MediaLikeNestedViewSet(viewsets.ViewSet):
             serializer.is_valid(raise_exception=True)
             # save the track data
             serializer.save(user=self.request.user)
-
+            rating = media.get_rating()
         except Exception as e:
             return Response({"detail": str(e)},
                             status=HTTP_400_BAD_REQUEST)
-        return Response(status=HTTP_201_CREATED)
+        return Response({"rating": rating}, status=HTTP_201_CREATED)
