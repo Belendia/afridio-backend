@@ -186,8 +186,7 @@ class Media(TimeStampedModel):
 
     slug = models.SlugField(blank=True, unique=True)
     estimated_length_in_seconds = models.PositiveIntegerField(null=True,
-                                                              blank=True, )
-    rating = models.PositiveIntegerField(null=True, blank=True)
+                                                              blank=True)
     release_date = models.DateField(null=True)
     description = models.TextField()
     featured = models.BooleanField(default=False)
@@ -257,6 +256,15 @@ class Media(TimeStampedModel):
 
     def get_status_type(self):
         return StatusType(self.status).name.title()
+
+    def is_liked(self, user):
+        ml = self.medialike_set.filter(user=user)
+        if ml.exists() and ml.count() > 0:
+            return ml[0].liked
+        return False
+
+    def get_rating(self):
+        return self.medialike_set.filter(liked=True).count()
 
 
 class Track(TimeStampedModel):

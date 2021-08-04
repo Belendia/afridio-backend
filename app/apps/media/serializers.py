@@ -221,11 +221,13 @@ class MediaSerializer(serializers.ModelSerializer):
     )
     images = ImageSlugRelatedField(many=True, slug_field='slug', queryset=Image.objects.all())
     release_date = serializers.SerializerMethodField()
+    liked = serializers.SerializerMethodField()
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Media
         fields = ('title', 'price', 'discount_price', 'slug', 'description', 'estimated_length_in_seconds',
-                  'rating', 'release_date', 'language', 'media_format', 'word_count', 'featured',
+                  'liked', 'rating', 'release_date', 'language', 'media_format', 'word_count', 'featured',
                   'album_type', 'genres', 'tracks', 'authors', 'narrators', 'images', 'status')
         read_only_fields = ('id', 'slug')
         lookup_field = 'slug'
@@ -239,6 +241,16 @@ class MediaSerializer(serializers.ModelSerializer):
         if obj.release_date:
             return obj.release_date.strftime("%d/%m/%Y")
         return ""
+
+    def get_rating(self, obj):
+        return obj.get_rating()
+
+    def get_liked(self, obj):
+        user = None
+        request = self.context.get('request', None)
+        if request:
+            user = request.user
+        return obj.is_liked(user)
 
 
 # MediaLike serializers
