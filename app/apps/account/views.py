@@ -1,5 +1,6 @@
 from django.contrib.auth import logout
 
+from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 from rest_framework import generics, authentication, permissions
@@ -15,6 +16,22 @@ class LoginView(ObtainAuthToken):
 
     serializer_class = LoginSerializer
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user': {
+                'name': user.name,
+                'sex': user.sex,
+                'phone_number': user.phone_number,
+                'date_of_birth': user.date_of_birth
+            }
+        })
 
 
 class RegisterUserView(generics.CreateAPIView):
