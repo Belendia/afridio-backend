@@ -97,6 +97,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UpdateUserSerializer(serializers.ModelSerializer):
     """Serializer for updating user information"""
+
     class Meta:
         model = get_user_model()
         fields = (
@@ -134,7 +135,6 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': msg})
 
         if not sms_backend.is_phone_number_verified(phone_number):
-
             # session_token = sms_backend.get_session_token(phone_number)
             msg = _('Please verify your phone.')
             otp_resend_time, session_token = get_otp_resend_time_remaining(user.phone_number)
@@ -142,4 +142,19 @@ class LoginSerializer(serializers.Serializer):
                                     'otp_resend_time': otp_resend_time})
 
         attrs['user'] = user
+        return attrs
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    """Serializer for changing user password"""
+
+    password = serializers.CharField(required=True, style={'input_type': 'password'}, trim_whitespace=False,
+                                     min_length=8)
+    password2 = serializers.CharField(required=True, style={'input_type': 'password'}, trim_whitespace=False)
+    old_password = serializers.CharField(required=True, style={'input_type': 'password'}, trim_whitespace=False)
+
+    def validate(self, attrs):
+        if attrs.get('password') != attrs.get('password2'):
+            raise serializers.ValidationError({"password2": "Password fields didn't match."})
+
         return attrs
