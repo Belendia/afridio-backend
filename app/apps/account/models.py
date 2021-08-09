@@ -64,7 +64,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                               null=True)
     name = models.CharField(max_length=255)
     date_of_birth = models.DateField(blank=True, null=True)
-    sex = models.CharField(max_length=20, choices=Sex.choices())
+    sex = models.CharField(max_length=20, choices=Sex.choices(), blank=True, null=True)
     picture = models.ImageField(blank=True, null=True)
     slug = models.CharField(max_length=100, null=True, blank=True)
     enable_2fa = models.BooleanField(default=False)

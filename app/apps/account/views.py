@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 
-from apps.account.serializers import LoginSerializer, UserSerializer
+from apps.account.serializers import LoginSerializer, UserSerializer, UpdateUserSerializer
 
 
 class LoginView(ObtainAuthToken):
@@ -38,6 +38,20 @@ class RegisterUserView(generics.CreateAPIView):
     """Create a new user in the system"""
 
     serializer_class = UserSerializer
+
+
+class UpdateUserView(generics.UpdateAPIView):
+    """Update the currently logged in user in the system"""
+
+    serializer_class = UpdateUserSerializer
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def update(self, request, *args, **kwargs):
+        serializer = self.serializer_class(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class MeView(generics.RetrieveUpdateAPIView):

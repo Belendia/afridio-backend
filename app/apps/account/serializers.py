@@ -95,6 +95,17 @@ class UserSerializer(serializers.ModelSerializer):
         return attrs
 
 
+class UpdateUserSerializer(serializers.ModelSerializer):
+    """Serializer for updating user information"""
+    class Meta:
+        model = get_user_model()
+        fields = (
+            'name',
+            'sex',
+            'date_of_birth'
+        )
+
+
 class LoginSerializer(serializers.Serializer):
     """Serializer for the user authentication object"""
 
