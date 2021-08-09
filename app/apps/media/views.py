@@ -225,8 +225,11 @@ class TrackDownloadNestedViewSet(viewsets.ViewSet):
             track = Track.objects.get(slug=kwargs['track_slug'])
             # assign the slug to track in the request
             request.data['track'] = track.slug
+            # Get the TrackDownload model which have the specified track and user, if it doesn't exist, create it
+            track_download, created = TrackDownload.objects.get_or_create(track=track, user=self.request.user)
+
             # assign the track data in the class's serializer
-            serializer = self.serializer_class(data=request.data)
+            serializer = self.serializer_class(track_download, data=request.data)
             # validate the track data
             serializer.is_valid(raise_exception=True)
             # save the track data
