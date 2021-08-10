@@ -83,12 +83,10 @@ class UserSerializer(serializers.ModelSerializer):
                 raise res
 
         attrs = {
-            'user': {
-                'name': user.name,
-                'sex': user.sex,
-                'phone_number': user.phone_number,
-                'date_of_birth': user.date_of_birth,
-            },
+            'name': user.name,
+            'sex': user.sex,
+            'phone_number': user.phone_number,
+            'date_of_birth': user.date_of_birth,
             'session_token': device_session_token,
             'otp_resend_time': settings.PHONE_VERIFICATION.get('OTP_RESEND_TIME', 300)
         }
