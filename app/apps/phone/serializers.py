@@ -33,7 +33,7 @@ class VerifyPhoneNumberAndLoginSerializer(serializers.Serializer):
             attrs.get("security_code", None),
             attrs.get("session_token", None),
         )
-        print("================0")
+
         try:
             user = User.objects.get(phone_number=phone_number)
             if not user.check_password(password):
@@ -42,14 +42,14 @@ class VerifyPhoneNumberAndLoginSerializer(serializers.Serializer):
         except User.DoesNotExist:
             msg = _("Unable to authenticate the account")
             raise serializers.ValidationError({'detail': msg})
-        print("================1")
+
         backend = get_sms_backend()
         verification, token_validation = backend.validate_security_code(
             security_code=security_code,
             phone_number=phone_number,
             session_token=session_token,
         )
-        print("================2")
+
         if verification is None:
             raise serializers.ValidationError({'detail': _("Security code is not valid")})
         elif token_validation == backend.SESSION_TOKEN_INVALID:
@@ -58,13 +58,13 @@ class VerifyPhoneNumberAndLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': _("Security code has expired")})
         elif token_validation == backend.SECURITY_CODE_VERIFIED:
             raise serializers.ValidationError({'detail': _("Security code is already verified")})
-        print("================3")
+
         user = authenticate(
             request=self.context.get('request'),
             username=phone_number,
             password=password
         )
-        print("================4")
+
         if not user:
             msg = _('Unable to authenticate with provided credentials')
             raise serializers.ValidationError({'detail': msg})
