@@ -6,6 +6,7 @@ from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.authtoken.models import Token
 import logging
 
 from apps.account.models import User
@@ -22,6 +23,22 @@ class VerifyPhoneNumberANDLoginViewSet(ObtainAuthToken):
 
     serializer_class = VerifyPhoneNumberAndLoginSerializer
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user': {
+                'name': user.name,
+                'sex': user.sex,
+                'phone_number': user.phone_number,
+                'date_of_birth': user.date_of_birth
+            }
+        })
 
 
 class ResendOTPView(APIView):
