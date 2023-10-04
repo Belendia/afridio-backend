@@ -12,7 +12,7 @@ filetype==1.0.7
 flake8==3.8.3
 minio==6.0.2
 nexmo>=2.4.0
-Pillow==9.3.0
+Pillow==10.0.1
 psycopg2>=2.7.5,<=2.8.5
 python-decouple==3.3
 redis==4.5.4
